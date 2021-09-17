@@ -1,0 +1,186 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+######################################################
+# Parameters:
+######################################################
+Parameters:
+  ObjectKeyPrefix:
+    Type: String
+  EnvName:
+    Type: String
+    AllowedValues:
+      - dev
+      - staging1
+      - staging2
+      - staging3
+      - staging4
+      - staging5
+      - prod
+    Description: Enter profile.
+  NameTag:
+    Type: String
+    Default: neo-ticket
+    AllowedValues:
+      - neo-ticket
+######################################################
+# Mappings:
+######################################################
+Mappings:
+  StackConfig:
+    ManagedPolicyArns:
+      AWSLambdaBasicExecutionRole: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    NameTag:
+      Value: neo-ticket
+
+######################################################
+# Resources:
+######################################################
+Resources:
+  #-----------------------
+  # ポリシー作成
+  #-----------------------
+  DynamoWriteAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize to write item into main dynamodb 
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/MAIN-${EnvName}
+
+  DynamoReadAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize to get item from user dynamodb 
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:Query
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/MAIN-${EnvName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/MAIN-${EnvName}/index/*
+
+  PutEventPolicy:
+    Properties:
+      Description: authorize to full access to sqs
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - events:PutEvents
+            Resource:
+              - "*"
+
+  #-----------------------
+  # ロールの作成
+  #-----------------------
+  RoleLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - ${NameTag}-${EnvName}-lambda-role
+        - {
+          NameTag: !FindInMap [ StackConfig, NameTag, Value ],
+          EnvName: !Ref EnvName
+        }
+      ManagedPolicyArns:
+        - !FindInMap [StackConfig, ManagedPolicyArns, AWSLambdaBasicExecutionRole]
+        - !Ref DynamoWriteAccessPolicy
+        - !Ref DynamoReadAccessPolicy
+        - !Ref PutEventPolicy
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+
+  #----------------------------------------------
+  # MAIN
+  #----------------------------------------------
+  CRAWLINGRESULT:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      TableName: !Sub CRAWLING_RESULT-${EnvName}
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  #----------------------------------------------
+  # lambda
+  #----------------------------------------------
+  LambdaBatchAssignCrawling:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: スケジュールデータ作成バッチ処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-BatchAssignCrawling
+      Handler: src/main/application/crawling/BatchAssignCrawling/index.handler
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/${NameTag}-${EnvName}-lambda-role
+      Runtime: nodejs12.x
+      Timeout: 900
+
+  ######################################################
+  # Event Bus
+  ######################################################
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties: 
+      Name: !Sub ${NameTag}-${EnvName}-event-bus
+
+  BatchAssignCrawling:
+    Type: AWS::Events::Rule
+    Properties: 
+      # EventBusName: !GetAtt
+      #   - EventBus
+      #   - Name
+      Name: !Sub ${NameTag}-${EnvName}-BatchAssignCrawling-rule
+      # RoleArn: String
+      ScheduleExpression: cron(* * * * ? *)
+      State: ENABLED
+      Targets: 
+        - Arn: !GetAtt
+            - LambdaBatchAssignCrawling
+            - Arn
+          Id: !Ref LambdaBatchAssignCrawling
+  
+  LambdaBatchAssignCrawlingEventBusPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaBatchAssignCrawling
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt
+        - BatchAssignCrawlingRule
+        - Arn

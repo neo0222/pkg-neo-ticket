@@ -42,6 +42,7 @@
         "crypto-js": "^4.0.0",
         "google-auth-library": "^7.0.4",
         "googleapis": "^71.0.0",
+        "html-to-json": "^0.6.0",
         "jsonwebtoken": "^8.5.1",
         "jwk-to-pem": "^2.0.4",
         "mocha": "^8.2.1",
