@@ -160,7 +160,7 @@ Resources:
     Properties: 
       Name: !Sub ${NameTag}-${EnvName}-event-bus
 
-  BatchAssignCrawling:
+  BatchAssignCrawlingRule:
     Type: AWS::Events::Rule
     Properties: 
       # EventBusName: !GetAtt
