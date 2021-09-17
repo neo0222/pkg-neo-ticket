@@ -5,7 +5,7 @@ import { SystemError } from "../../common/SystemError";
 import { IEventBridgeInvoker } from "../../gateway/IEventBridgeInvoker";
 
 const envName = process.env["ENV_NAME"]
-const eventBusName = `blast-${envName}-event-bus`
+const eventBusName = `neo-ticket-${envName}-event-bus`
 
 export class EventBridgeInvoker implements IEventBridgeInvoker {
 

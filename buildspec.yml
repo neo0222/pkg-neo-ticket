@@ -11,11 +11,11 @@ phases:
       - npm i
       - npm run build
       - (cd ./dist && zip -r Deploy.zip ./)
-      - aws s3 mv ./dist/Deploy.zip s3://blast-${ENVIRONMENT_NAME}-release/resources/${CODEBUILD_BUILD_NUMBER}/Deploy.zip
+      - aws s3 mv ./dist/Deploy.zip s3://neo-ticket-${ENVIRONMENT_NAME}-release/resources/${CODEBUILD_BUILD_NUMBER}/Deploy.zip
       - aws cloudformation deploy
-          --stack-name blast-${ENVIRONMENT_NAME}-resources
+          --stack-name neo-ticket-${ENVIRONMENT_NAME}-resources
           --template-file infra/resources.yaml
-          --s3-bucket blast-${ENVIRONMENT_NAME}-release
+          --s3-bucket neo-ticket-${ENVIRONMENT_NAME}-release
           --s3-prefix templates/outputs
           --parameter-overrides NameTag=${NAME_TAG} EnvName=${ENVIRONMENT_NAME} ObjectKeyPrefix=resources/${CODEBUILD_BUILD_NUMBER}
           --capabilities CAPABILITY_AUTO_EXPAND
