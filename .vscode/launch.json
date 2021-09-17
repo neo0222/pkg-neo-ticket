@@ -1,0 +1,38 @@
+{
+  // IntelliSense を使用して利用可能な属性を学べます。
+  // 既存の属性の説明をホバーして表示します。
+  // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "args": [
+        "-u",
+        "bdd",
+        "--timeout",
+        "999999",
+        "--colors",
+        "-r",
+        "ts-node/register",
+        "src/test/**/*.ts",
+        "src/test/**/**/*.ts",
+        "src/test/**/**/**/*.ts",
+        "src/test/**/**/**/**/*.ts"
+      ],
+      "internalConsoleOptions": "openOnSessionStart",
+      "name": "Mocha Tests",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "node"
+    },
+    {
+      "type": "pwa-msedge",
+      "request": "launch",
+      "name": "Launch Chrome against localhost",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}

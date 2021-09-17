@@ -1,0 +1,52 @@
+{
+    "name": "pkg-neo-ticket",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "npm run build && npm run dotenv && mocha ./dist/src/test/ --recursive && npm run clean",
+        "clean": "rimraf ./dist",
+        "ts": " tsc -p tsconfig.json",
+        "cp": "cp -R node_modules ./dist/node_modules",
+        "dotenv": "cp ./.env-example ./.env",
+        "build": "npm run clean && npm run ts && npm run cp && rm -rf dist/src/test",
+        "pre-build": "npm run build && npm run clean",
+        "watch": "tsc -w"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/jsonwebtoken": "^8.5.4",
+        "@types/jwk-to-pem": "^2.0.1",
+        "@types/mocha": "^8.2.0",
+        "@types/node": "^12.0.0",
+        "@types/power-assert": "^1.5.3",
+        "aws-sdk": "^2.441.0",
+        "bestzip": "^2.1.2",
+        "dotenv": "^8.2.0",
+        "moment": "^2.29.1",
+        "nyc": "^15.1.0",
+        "power-assert": "^1.6.1",
+        "rimraf": "^2.6.3",
+        "ts-loader": "^5.4.3",
+        "ts-node": "^8.10.2"
+    },
+    "dependencies": {
+        "@types/bignumber.js": "^5.0.0",
+        "@types/crypto-js": "^4.0.1",
+        "@types/moment": "^2.13.0",
+        "@types/moment-timezone": "^0.5.30",
+        "axios": "^0.21.1",
+        "bignumber.js": "^9.0.1",
+        "builder-pattern": "^1.2.4",
+        "crypto-js": "^4.0.0",
+        "google-auth-library": "^7.0.4",
+        "googleapis": "^71.0.0",
+        "jsonwebtoken": "^8.5.1",
+        "jwk-to-pem": "^2.0.4",
+        "mocha": "^8.2.1",
+        "moment-timezone": "^0.5.32",
+        "shallow-equal-object": "^1.1.1",
+        "typescript": "^4.1.3"
+    }
+}
