@@ -3,6 +3,7 @@ import { PerformanceCode } from "../../value/performance/PerformanceCode";
 import { PerformanceDate } from "../../value/performance/PerformanceDate";
 import { PerformanceId } from "../../value/performance/PerformanceId";
 import { PerformanceName } from "../../value/performance/PerformanceName";
+import { VacantSeatInfoList } from "../../value/seat/VacantSeatInfoList";
 import { EntityBase } from "../EntityBase";
 
 export class CrawlingResult extends EntityBase {

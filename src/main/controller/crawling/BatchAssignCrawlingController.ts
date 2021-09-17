@@ -23,7 +23,7 @@ export class BatchAssignCrawlingController implements IController {
     try {
       const session: Session = await this.crawlingInvoker.getSession()
       const yearAndMonthList: string[] = await this.crawlingInvoker.getYearAndMonthList(session)
-      const promises = []
+      const promises: Promise<void>[] = []
       for (const yyyymm of yearAndMonthList) {
         promises.push(this.eventBridgeInvoker.putEvents(
           DetailType.AssignCrawling,

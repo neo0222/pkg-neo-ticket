@@ -1,14 +1,17 @@
-import { BatchCreateScheduleController } from "../../../controller/schedule/BatchCreateScheduleController";
-import { BoyRepository } from "../../../infrastructure/boy/BoyRepository";
-import { ScheduleRepository } from "../../../infrastructure/schedule/ScheduleRepository";
+import { BatchAssignCrawlingController } from "../../../controller/crawling/BatchAssignCrawlingController";
+import { CrawlingInvoker } from "../../../infrastructure/crawling/CrawlingInvoker";
+import { EventBridgeInvoker } from "../../../infrastructure/event-bridge/EventBridgeInvoker";
 import { EventBridgeLambdaEvent } from "../../event-bridge/EventBridgeLambdaEvent";
 import { LambdaFunction } from "../../LambdaFunction";
-import { BatchCreateScheduleDetail } from "./BatchCreateScheduleDetail";
+import { BatchAssignCrawlingDetail } from "./BatchAssignCrawlingDetail";
 
 exports.handler = async (event, context) => {
 
-  const controller = new BatchCreateScheduleController(new ScheduleRepository(), new BoyRepository())
-  const lambda = new LambdaFunction<EventBridgeLambdaEvent<BatchCreateScheduleDetail>, any>(controller);
+  const controller = new BatchAssignCrawlingController(
+    new CrawlingInvoker(),
+    new EventBridgeInvoker()
+  )
+  const lambda = new LambdaFunction<EventBridgeLambdaEvent<BatchAssignCrawlingDetail>, any>(controller);
 
   return lambda.handler(event, context)
 }

@@ -1,9 +1,4 @@
-import { UsageType } from "../../model/enum/UsageType";
 import { ValueObject } from "../ValueObject";
-import { IReservationAvailabilityInfo } from "./IReservationAvailabilityInfo";
-import { ReservationAvailabilityInfoForDelivery } from "./ReservationAvailabilityInfoForDelivery";
-import { ReservationAvailabilityInfoForPrivateRoom } from "./ReservationAvailabilityInfoForPrivateRoom";
-import { ReservationAvailableDatetime } from "./ReservationAvailableDatetime";
 import { VacantSeatInfo } from "./VacantSeatInfo";
 
 interface VacantSeatInfoListProps {
