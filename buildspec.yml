@@ -18,7 +18,7 @@ phases:
           --s3-bucket neo-ticket-${ENVIRONMENT_NAME}-release
           --s3-prefix templates/outputs
           --parameter-overrides NameTag=${NAME_TAG} EnvName=${ENVIRONMENT_NAME} ObjectKeyPrefix=resources/${CODEBUILD_BUILD_NUMBER}
-          --capabilities CAPABILITY_AUTO_EXPAND
+          --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM
       - cd ..
 artifacts:
   files:
