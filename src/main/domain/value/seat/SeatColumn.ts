@@ -9,4 +9,12 @@ export class SeatColumn extends PrimitiveValueObject<string> {
   toString(): string {
     return this.value
   }
+
+  isEqualOrLessThan(num: number): boolean {
+    return Number(this.value) <= num
+  }
+
+  isEqualOrGreaterThan(num: number): boolean {
+    return Number(this.value) >= num
+  }
 }
