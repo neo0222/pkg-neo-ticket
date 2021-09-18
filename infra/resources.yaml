@@ -231,6 +231,18 @@ Resources:
       Runtime: nodejs12.x
       Timeout: 900
       MemorySize: 300
+  
+  TriggerLambdaPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt 
+        - LambdaPersistCrawlingResult
+        - Arn
+      Principal: "s3.amazonaws.com"
+      SourceArn: !GetAtt
+        - S3CrawlingBucket
+        - Arn
 
   ######################################################
   # Event Bus
