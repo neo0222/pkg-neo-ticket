@@ -162,6 +162,10 @@ Resources:
           NameTag: !FindInMap [ StackConfig, NameTag, Value ],
           EnvName: !Ref EnvName
         }
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256  
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: "s3:ObjectCreated:*"
@@ -235,7 +239,7 @@ Resources:
         - LambdaPersistCrawlingResult
         - Arn
       Principal: "s3.amazonaws.com"
-      SourceArn: !Sub arn:aws:s3:::${NameTag}-${EnvName}-release
+      SourceArn: !Sub arn:aws:s3:::${NameTag}-${EnvName}-crawling
 
   ######################################################
   # Event Bus
