@@ -12,9 +12,9 @@ export class CrawlingDatetime extends PrimitiveValueObject<moment.Moment> {
   }
 
   static fromYYYYMMDDHHmmss(value: string): CrawlingDatetime {
-    const result: string = moment(value, 'YYYYMMDDHH:mm:ss').locale('ja').format('YYYYMMDDHH:mm:ss')
+    const result: string = moment(value, 'YYYYMMDDHHmmss').locale('ja').format('YYYYMMDDHHmmss')
     if (result !== value) throw BusinessError.INVALID_DATE_FORMAT
-    return CrawlingDatetime.create(moment(value, 'YYYYMMDDHH:mm:ss').locale('ja').format('YYYY-MM-DD HH:mm:ss'))
+    return CrawlingDatetime.create(moment(value, 'YYYYMMDDHHmmss').locale('ja').format('YYYY-MM-DD HH:mm:ss'))
   }
 
   format(): string {

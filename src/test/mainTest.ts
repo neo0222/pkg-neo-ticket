@@ -37,3 +37,9 @@ describe('XMLパース', async () => {
     assert.deepEqual(jsonObj, fs.readFileSync( 'src/test/crawling/svg.xml', 'utf-8' ))
   })
 })
+
+describe('ファイル名から日付取得', async () => {
+  it('正常系', async () => {
+    assert.equal('20210919091832.txt'.replace(/\..*/, ''), '20210919091832')
+  })
+})
