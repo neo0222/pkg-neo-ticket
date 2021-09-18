@@ -48,11 +48,8 @@ export class VacantSeatRepository implements ISeatRepository {
         '#pk': 'pk',
         '#isVacant': 'isVacant',
       },
-      ExpressionAttributeValues: {
-        ':false': 'false',
-      },
       Item: dto as AWS.DynamoDB.DocumentClient.ItemCollectionKeyAttributeMap,
-      ConditionExpression: 'attribute_not_exists(#pk) OR #isVacant=:false'
+      ConditionExpression: 'attribute_not_exists(#pk) OR attribute_not_exists(#isVacant)'
     }
     try {
       await this.docClient.put(params).promise();

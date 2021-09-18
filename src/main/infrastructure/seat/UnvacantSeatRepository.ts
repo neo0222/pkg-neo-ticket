@@ -71,27 +71,10 @@ export class UnvacantSeatRepository implements ISeatRepository {
     date: PerformanceDate,
     matineeOrSoiree: MatineeOrSoiree
   ): Promise<Optional<Seat[]>> {
-    const params: AWS.DynamoDB.DocumentClient.QueryInput = {
-      TableName: this.tableName,
-      IndexName: 'isVacant-sk-index',
-      ExpressionAttributeNames:{
-        '#isVacant': 'isVacant',
-        '#sk': 'sk',
-      },
-      ExpressionAttributeValues:{
-        ':false': 'false',
-        ':skPrefix': `${code.toString()}#${date.toString()}#${matineeOrSoiree}`,
-      },
-      KeyConditionExpression: '#isVacant = :false AND begins_with(#sk, :skPrefix)',
-    };
+    throw SystemError.DYNAMO_ACCESS_FAILED
+  }
 
-    try {
-      const result: AWS.DynamoDB.DocumentClient.QueryOutput = await this.docClient.query(params).promise();
-      return Optional.ofNullable(result.Items ? result.Items.map(dto => SeatConverter.toEntity(dto as SeatDto)) : undefined);
-    }
-    catch (error: any) {
-      console.error(error)
-      throw SystemError.DYNAMO_ACCESS_FAILED
-    }
+  async findByCode(code: PerformanceCode): Promise<Optional<Seat[]>> {
+    throw SystemError.DYNAMO_ACCESS_FAILED
   }
 }
