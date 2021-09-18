@@ -27,9 +27,11 @@ const columnMapping = [
   '30','31','32','33','34','35','36','37','38','39','40','41','42',
 ] // TODO: 劇場によって変わる
 
+const axiosInstance = axios.create({ timeout: 20000 })
+
 export class CrawlingInvoker implements ICrawlingInvoker {
   async getSession(): Promise<Session> {
-    const topPageRes = await axios.get(
+    const topPageRes = await axiosInstance.get(
       'https://entrance.shiki.jp/ticket/top.do'
     )
     console.log(`[SUCCESS]moved to performance select page.`)
@@ -55,7 +57,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
   }
 
   async getYearAndMonthList(session: Session): Promise<string[]> {
-    await axios.post(
+    await axiosInstance.post(
       `https://tickets.shiki.jp/ticket/RY101002.do?koenCode=1011&edaban=00&koenKi=6&allJapan=0`,
       {},
       {
@@ -63,7 +65,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       })
     console.log(`[SUCCESS]selected performance.`)
   
-    const selectDatePageRes = await axios.post(
+    const selectDatePageRes = await axiosInstance.post(
       'https://tickets.shiki.jp/ticket/RY101003.do?alctChange=0',
       {},
       {
@@ -85,7 +87,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
   }
 
   async getAvailabledatetimeList(session: Session, yyyymm: string): Promise<PerformanceDatetimeInfoList> {
-    await axios.post(
+    await axiosInstance.post(
       `https://tickets.shiki.jp/ticket/RY101002.do?koenCode=1011&edaban=00&koenKi=6&allJapan=0`,
       {},
       {
@@ -93,7 +95,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       })
     console.log(`[SUCCESS]selected performance.`)
   
-    await axios.post(
+    await axiosInstance.post(
       'https://tickets.shiki.jp/ticket/RY101003.do?alctChange=0',
       {},
       {
@@ -102,7 +104,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
     )
     console.log(`[SUCCESS]moved to date select page.`)
 
-    await axios.post(
+    await axiosInstance.post(
       `https://tickets.shiki.jp/ticket/RY104005.do?alctChange=0&yyyymm=${yyyymm}`,
       {},
       {
@@ -110,7 +112,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       })
     console.log(`[SUCCESS]selected yyyymm. ${yyyymm}`)
   
-    const selectYyyyMmPageRes = await axios.post(
+    const selectYyyyMmPageRes = await axiosInstance.post(
       `https://tickets.shiki.jp/ticket/RY104005.do?alctChange=0&yyyymm=${yyyymm}`,
       {},
       {
@@ -158,7 +160,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
   }
 
   async getAvailableSeatList(session: Session, yyyymm: string, availableDatetime: PerformanceDatetimeInfo): Promise<VacantSeatInfoList> {
-    const selectDateRes = await axios.post(
+    const selectDateRes = await axiosInstance.post(
       `https://tickets.shiki.jp/ticket/RY104003.do?alctChange=0&koenDay=${availableDatetime.day}&tuyaKbn=${availableDatetime.matineeOrSoiree}`,
       {},
       {
@@ -170,7 +172,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       console.log(selectDateRes.data)
     }
   
-    const selectSeatPageRes = await axios.post(
+    const selectSeatPageRes = await axiosInstance.post(
       'https://tickets.shiki.jp/ticket/RY104006.do?alctChange=0',
       {},
       {
@@ -190,7 +192,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       }
     })
 
-    const getSvgRes = await axios.get(
+    const getSvgRes = await axiosInstance.get(
       `https://tickets.shiki.jp${promise.svg}`,
       {
         headers: this.createHeadersForSvg(session.skSession, session.bigIpKeyValueJoinWithEqual),
