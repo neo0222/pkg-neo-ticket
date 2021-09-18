@@ -28,8 +28,7 @@ export const CrawlingResultConverter = class CrawlingResultConverter implements 
             column: vacantSeat.column,
           })
         })
-      }),
-      CrawlingDatetime.create(dto.crawlingDatetime)
+      })
     )
   }
 
@@ -50,8 +49,7 @@ export const CrawlingResultConverter = class CrawlingResultConverter implements 
           `${vacantSeatInfo.row}`,
           `${vacantSeatInfo.column}`,
         )
-      }),
-      `${entity.crawlingDatetime}`
+      })
     )
   }
 }

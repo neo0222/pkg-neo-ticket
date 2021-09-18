@@ -15,6 +15,7 @@ import { PerformanceDate } from "../../domain/value/performance/PerformanceDate"
 import { PerformanceDatetimeInfoList } from "../../domain/value/performance/PerformanceDatetimeInfoList"
 import { PerformanceId } from "../../domain/value/performance/PerformanceId"
 import { PerformanceName } from "../../domain/value/performance/PerformanceName"
+import { DetectionDatetime } from "../../domain/value/seat/DetectionDatetime"
 import { VacantSeatInfoList } from "../../domain/value/seat/VacantSeatInfoList"
 import { ICrawlingInvoker } from "../../gateway/ICrawlingInvoker"
 import { IS3Invoker } from "../../gateway/IS3Invoker"
@@ -45,6 +46,8 @@ export class PersistVacantSeatController implements IController {
           if (record.dynamodb?.NewImage?.performanceCode?.S === undefined) throw BusinessError.PERFORMANCE_CODE_NOT_GIVEN
           if (record.dynamodb?.NewImage?.performanceDate?.S === undefined) throw BusinessError.PERFORMANCE_DATE_NOT_GIVEN
           if (record.dynamodb?.NewImage?.matineeOrSoiree?.S === undefined) throw BusinessError.MATINEE_OR_SOIREE_NOT_GIVEN
+          if (record.dynamodb?.ApproximateCreationDateTime === undefined) throw BusinessError.INVALID_DATE_FORMAT
+          const unixTime: number = record.dynamodb?.ApproximateCreationDateTime
           const crawlingResult: CrawlingResult = (await this.crawlingResultRepository.findByCodeAndDateAndMatineeOrSoiree(
             PerformanceCode.create(record.dynamodb.NewImage['performanceCode'].S),
             PerformanceDate.create(record.dynamodb.NewImage['performanceDate'].S),
@@ -60,7 +63,7 @@ export class PersistVacantSeatController implements IController {
                 crawlingResult.performanceDate,
                 crawlingResult.matineeOrSoiree,
                 vacantSeatInfo,
-                crawlingResult.crawlingDatetime.convertToDetectionDatetime()
+                DetectionDatetime.fromUnixTime(unixTime)
               )
               await this.seatRepository.save(seat)
             })())

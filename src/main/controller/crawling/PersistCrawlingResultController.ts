@@ -50,8 +50,7 @@ export class PersistCrawlingResultController implements IController {
             PerformanceName.create('オペラ座の怪人'), // TODO: 複数演目に対応できるようにする
             PerformanceDate.create(performanceDate),
             matineeOrSoiree,
-            vacantSeatInfoList,
-            CrawlingDatetime.fromYYYYMMDDHHmmss(fileName.replace(/\..*/, ''))
+            vacantSeatInfoList
           )
           this.crawlingResultRepository.save(crawlingResult)
         })())

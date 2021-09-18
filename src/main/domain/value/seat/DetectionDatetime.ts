@@ -10,6 +10,10 @@ export class DetectionDatetime extends PrimitiveValueObject<moment.Moment> {
     return new DetectionDatetime(moment(value, 'YYYY-MM-DD HH:mm:ss').locale('ja'));
   }
 
+  static fromUnixTime(unixTime: number): DetectionDatetime {
+    return new DetectionDatetime(moment.unix(unixTime).locale('ja'))
+  }
+
   format(): string {
     return this._value.format('YYYY-MM-DD HH:mm:ss')
   }

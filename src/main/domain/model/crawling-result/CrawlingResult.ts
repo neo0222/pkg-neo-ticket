@@ -14,7 +14,6 @@ export class CrawlingResult extends EntityBase {
   performanceDate: PerformanceDate
   matineeOrSoiree: MatineeOrSoiree
   vacantSeatInfoList: VacantSeatInfoList
-  crawlingDatetime: CrawlingDatetime
 
   constructor(
     _performanceId: PerformanceId,
@@ -23,7 +22,6 @@ export class CrawlingResult extends EntityBase {
     _performanceDate: PerformanceDate,
     _matineeOrSoiree: MatineeOrSoiree,
     _vacantSeatInfoList: VacantSeatInfoList,
-    _crawlingDatetime: CrawlingDatetime
   ) {
     super()
     this.performanceId = _performanceId
@@ -32,6 +30,5 @@ export class CrawlingResult extends EntityBase {
     this.performanceDate = _performanceDate
     this.matineeOrSoiree = _matineeOrSoiree
     this.vacantSeatInfoList = _vacantSeatInfoList
-    this.crawlingDatetime = _crawlingDatetime
   }
 }

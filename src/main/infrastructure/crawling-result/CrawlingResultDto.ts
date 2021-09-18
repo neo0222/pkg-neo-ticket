@@ -12,7 +12,6 @@ export class CrawlingResultDto implements IDto {
   performanceDate: string
   matineeOrSoiree: MatineeOrSoiree
   vacantSeatInfoList: VacantSeatInfoDto[]
-  crawlingDatetime: string
 
   constructor(
     _pk: string,
@@ -23,7 +22,6 @@ export class CrawlingResultDto implements IDto {
     _performanceDate: string,
     _matineeOrSoiree: MatineeOrSoiree,
     _vacantSeatInfoList: VacantSeatInfoDto[],
-    _crawlingDatetime: string
   ) {
     this.pk = _pk
     this.sk = _sk
@@ -33,6 +31,5 @@ export class CrawlingResultDto implements IDto {
     this.performanceDate = _performanceDate
     this.matineeOrSoiree = _matineeOrSoiree
     this.vacantSeatInfoList = _vacantSeatInfoList
-    this.crawlingDatetime = _crawlingDatetime
   }
 }
