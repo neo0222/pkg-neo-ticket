@@ -34,7 +34,7 @@ describe('XMLパース', async () => {
       null,
       2)
     );
-    assert.deepEqual(jsonObj, fs.readFileSync( 'src/test/crawling/svg.xml', 'utf-8' ))
+    assert.deepEqual(jsonObj, JSON.parse(fs.readFileSync( 'src/test/crawling/converted.json', 'utf-8' )))
   })
 })
 
