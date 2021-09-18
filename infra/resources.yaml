@@ -241,9 +241,7 @@ Resources:
         - LambdaPersistCrawlingResult
         - Arn
       Principal: "s3.amazonaws.com"
-      SourceArn: !GetAtt
-        - S3CrawlingBucket
-        - Arn
+      SourceArn: !Sub arn:aws:s3:::${NameTag}-${EnvName}-release
 
   ######################################################
   # Event Bus
