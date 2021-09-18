@@ -1,6 +1,6 @@
 import { DetailType } from '../../application/event-bridge/DetailType';
 import { EventBridgeLambdaEvent } from "../../application/event-bridge/EventBridgeLambdaEvent";
-import { BatchAssignCrawlingDetail } from "../../application/crawling/BatchAssignCrawling/BatchAssignCrawlingDetail";
+import { BatchAssignCrawlingDetail } from "../../application/crawling/detail/BatchAssignCrawlingDetail";
 import { Session } from '../../domain/model/session/Session';
 import { ICrawlingInvoker } from '../../gateway/ICrawlingInvoker';
 import { IEventBridgeInvoker } from '../../gateway/IEventBridgeInvoker';

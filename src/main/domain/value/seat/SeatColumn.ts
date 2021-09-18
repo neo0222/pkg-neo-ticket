@@ -6,4 +6,8 @@ export class SeatColumn extends PrimitiveValueObject<string> {
     if (!Number.isNaN(Number(value))) throw BusinessError.INVALID_COLUMN
     return new SeatColumn(value);
   }
+
+  toString(): string {
+    return this.value
+  }
 }

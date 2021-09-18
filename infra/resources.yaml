@@ -139,7 +139,7 @@ Resources:
   LambdaBatchAssignCrawling:
     Type: AWS::Lambda::Function
     Properties:
-      Description: スケジュールデータ作成バッチ処理
+      Description: クロール対象割当処理
       Code:
         S3Bucket: !Sub ${NameTag}-${EnvName}-release
         S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
@@ -148,6 +148,22 @@ Resources:
           ENV_NAME: !Ref EnvName
       FunctionName: !Sub ${NameTag}-${EnvName}-BatchAssignCrawling
       Handler: src/main/application/crawling/BatchAssignCrawling/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+  
+  LambdaCrawlVacantSeat:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 空席クロール処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-CrawlVacantSeat
+      Handler: src/main/application/crawling/CrawlVacantSeat/index.handler
       Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
@@ -185,3 +201,27 @@ Resources:
       SourceArn: !GetAtt
         - BatchAssignCrawlingRule
         - Arn
+
+  AssignCrawlingRule:
+    Type: AWS::Events::Rule
+    Properties: 
+      EventBusName: !GetAtt
+        - EventBus
+        - Name
+      EventPattern:
+        detail-type: 
+          - AssignCrawling
+      Name: !Sub ${NameTag}-${EnvName}-AssignCrawling-rule
+      State: ENABLED
+      Targets: 
+        - Arn: !GetAtt
+            - LambdaCrawlVacantSeat
+            - Arn
+          Id: !Ref LambdaCrawlVacantSeat
+  
+  LambdaCrawlVacantSeatEventBusPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaCrawlVacantSeat
+      Principal: events.amazonaws.com

@@ -12,4 +12,8 @@ export class PerformanceDate extends PrimitiveValueObject<moment.Moment> {
   format(): string {
     return this._value.format('YYYYMMDD')
   }
+
+  toString(): string {
+    return this.format()
+  }
 }

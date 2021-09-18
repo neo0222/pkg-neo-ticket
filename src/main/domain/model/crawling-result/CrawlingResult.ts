@@ -13,4 +13,21 @@ export class CrawlingResult extends EntityBase {
   performanceDate: PerformanceDate
   matineeOrSoiree: MatineeOrSoiree
   vacantSeatInfoList: VacantSeatInfoList
+
+  constructor(
+    _performanceId: PerformanceId,
+    _performanceCode: PerformanceCode,
+    _performanceName: PerformanceName,
+    _performanceDate: PerformanceDate,
+    _matineeOrSoiree: MatineeOrSoiree,
+    _vacantSeatInfoList: VacantSeatInfoList
+  ) {
+    super()
+    this.performanceId = _performanceId
+    this.performanceCode = _performanceCode
+    this.performanceName = _performanceName
+    this.performanceDate = _performanceDate
+    this.matineeOrSoiree = _matineeOrSoiree
+    this.vacantSeatInfoList = _vacantSeatInfoList
+  }
 }

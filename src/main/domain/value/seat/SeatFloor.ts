@@ -6,4 +6,8 @@ export class SeatFloor extends PrimitiveValueObject<string> {
     if (!['1', '2'].includes(value)) throw BusinessError.INVALID_FLOOR
     return new SeatFloor(value);
   }
+
+  toString(): string {
+    return this.value
+  }
 }
