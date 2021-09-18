@@ -1,6 +1,7 @@
 import { CrawlVacantSeatController } from "../../../controller/crawling/CrawlVacantSeatController";
 import { CrawlingResultRepository } from "../../../infrastructure/crawling-result/CrawlingResultRepository";
 import { CrawlingInvoker } from "../../../infrastructure/crawling/CrawlingInvoker";
+import { S3Invoker } from "../../../infrastructure/s3/S3Invoker";
 import { DetailType } from "../../event-bridge/DetailType";
 import { EventBridgeLambdaEvent } from "../../event-bridge/EventBridgeLambdaEvent";
 import { LambdaFunction } from "../../LambdaFunction";
@@ -14,7 +15,7 @@ exports.handler = async (event, context) => {
     case DetailType.AssignCrawling:
       controller = new CrawlVacantSeatController(
         new CrawlingInvoker(),
-        new CrawlingResultRepository()
+        new S3Invoker()
       )
       lambda = new LambdaFunction<EventBridgeLambdaEvent<BatchAssignCrawlingDetail>, any>(controller)
       break
