@@ -148,7 +148,7 @@ Resources:
           ENV_NAME: !Ref EnvName
       FunctionName: !Sub ${NameTag}-${EnvName}-BatchAssignCrawling
       Handler: src/main/application/crawling/BatchAssignCrawling/index.handler
-      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/${NameTag}-${EnvName}-lambda-role
+      Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
 

@@ -84,6 +84,9 @@ Resources:
               - cloudformation:*
               - apigateway:*
               - events:*
+              - iam:*
+              - dynamodb:*
+              - event:*
           - Effect: Allow
             Resource:
               - "*"
