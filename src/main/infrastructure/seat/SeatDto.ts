@@ -1,4 +1,5 @@
 import { MatineeOrSoiree } from "../../domain/value/performance/MatineeOrSoiree";
+import { PerformanceStartTime } from "../../domain/value/performance/PerformanceStartTime";
 import { IDto } from "../IDto";
 
 export class SeatDto implements IDto {
@@ -9,6 +10,7 @@ export class SeatDto implements IDto {
   performanceName: string
   performanceDate: string
   matineeOrSoiree: MatineeOrSoiree
+  performanceStartTime: string
   floor: string
   row: string
   column: string
@@ -23,6 +25,7 @@ export class SeatDto implements IDto {
     _performanceName: string,
     _performanceDate: string,
     _matineeOrSoiree: MatineeOrSoiree,
+    _performanceStartTime: string,
     _floor: string,
     _row: string,
     _column: string,
@@ -36,6 +39,7 @@ export class SeatDto implements IDto {
     this.performanceName = _performanceName
     this.performanceDate = _performanceDate
     this.matineeOrSoiree = _matineeOrSoiree
+    this.performanceStartTime = _performanceStartTime
     this.floor = _floor
     this.row = _row
     this.column = _column

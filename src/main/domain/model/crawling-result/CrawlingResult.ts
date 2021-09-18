@@ -4,6 +4,7 @@ import { PerformanceCode } from "../../value/performance/PerformanceCode";
 import { PerformanceDate } from "../../value/performance/PerformanceDate";
 import { PerformanceId } from "../../value/performance/PerformanceId";
 import { PerformanceName } from "../../value/performance/PerformanceName";
+import { PerformanceStartTime } from "../../value/performance/PerformanceStartTime";
 import { VacantSeatInfoList } from "../../value/seat/VacantSeatInfoList";
 import { EntityBase } from "../EntityBase";
 
@@ -13,6 +14,7 @@ export class CrawlingResult extends EntityBase {
   performanceName: PerformanceName
   performanceDate: PerformanceDate
   matineeOrSoiree: MatineeOrSoiree
+  performanceStartTime: PerformanceStartTime
   vacantSeatInfoList: VacantSeatInfoList
 
   constructor(
@@ -21,6 +23,7 @@ export class CrawlingResult extends EntityBase {
     _performanceName: PerformanceName,
     _performanceDate: PerformanceDate,
     _matineeOrSoiree: MatineeOrSoiree,
+    _performanceStartTime: PerformanceStartTime,
     _vacantSeatInfoList: VacantSeatInfoList,
   ) {
     super()
@@ -29,6 +32,7 @@ export class CrawlingResult extends EntityBase {
     this.performanceName = _performanceName
     this.performanceDate = _performanceDate
     this.matineeOrSoiree = _matineeOrSoiree
+    this.performanceStartTime = _performanceStartTime
     this.vacantSeatInfoList = _vacantSeatInfoList
   }
 }

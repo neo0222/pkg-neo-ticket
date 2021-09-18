@@ -3,6 +3,7 @@ import { PerformanceCode } from "../../domain/value/performance/PerformanceCode"
 import { PerformanceDate } from "../../domain/value/performance/PerformanceDate";
 import { PerformanceId } from "../../domain/value/performance/PerformanceId";
 import { PerformanceName } from "../../domain/value/performance/PerformanceName";
+import { PerformanceStartTime } from "../../domain/value/performance/PerformanceStartTime";
 import { DetectionDatetime } from "../../domain/value/seat/DetectionDatetime";
 import { IsVacant } from "../../domain/value/seat/IsVacant";
 import { VacantSeatInfo } from "../../domain/value/seat/VacantSeatInfo";
@@ -19,6 +20,7 @@ export const SeatConverter = class SeatConverter implements IDtoConverter<SeatDt
       PerformanceName.create(dto.performanceName),
       PerformanceDate.create(dto.performanceDate),
       dto.matineeOrSoiree,
+      PerformanceStartTime.create(dto.performanceStartTime),
       VacantSeatInfo.create({
         floor: dto.floor,
         row: dto.row,
@@ -38,6 +40,7 @@ export const SeatConverter = class SeatConverter implements IDtoConverter<SeatDt
       `${entity.performanceName}`,
       `${entity.performanceDate}`,
       entity.matineeOrSoiree,
+      `${entity.performanceStartTime}`,
       `${entity.seatInfo.floor}`,
       `${entity.seatInfo.row}`,
       `${entity.seatInfo.column}`,

@@ -16,4 +16,8 @@ export class PerformanceDate extends PrimitiveValueObject<moment.Moment> {
   toString(): string {
     return this.format()
   }
+
+  formatJp(): string {
+    return this._value.format('YYYY年M月D日(ddd)')
+  }
 }

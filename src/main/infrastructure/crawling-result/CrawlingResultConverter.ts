@@ -4,6 +4,7 @@ import { PerformanceCode } from "../../domain/value/performance/PerformanceCode"
 import { PerformanceDate } from "../../domain/value/performance/PerformanceDate";
 import { PerformanceId } from "../../domain/value/performance/PerformanceId";
 import { PerformanceName } from "../../domain/value/performance/PerformanceName";
+import { PerformanceStartTime } from "../../domain/value/performance/PerformanceStartTime";
 import { VacantSeatInfo } from "../../domain/value/seat/VacantSeatInfo";
 import { VacantSeatInfoList } from "../../domain/value/seat/VacantSeatInfoList";
 import { IDtoConverter } from "../IDtoConverter";
@@ -20,6 +21,7 @@ export const CrawlingResultConverter = class CrawlingResultConverter implements 
       PerformanceName.create(dto.performanceName),
       PerformanceDate.create(dto.performanceDate),
       dto.matineeOrSoiree,
+      PerformanceStartTime.create(dto.performanceStartTime),
       VacantSeatInfoList.create({
         list: dto.vacantSeatInfoList.map(vacantSeat => {
           return VacantSeatInfo.create({
@@ -41,6 +43,7 @@ export const CrawlingResultConverter = class CrawlingResultConverter implements 
       `${entity.performanceName}`,
       `${entity.performanceDate}`,
       entity.matineeOrSoiree,
+      `${entity.performanceStartTime}`,
       entity.vacantSeatInfoList.list.map(vacantSeatInfo => {
         return new VacantSeatInfoDto(
           `${vacantSeatInfo.floor}#${vacantSeatInfo.row}#${vacantSeatInfo.column}`,

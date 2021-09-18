@@ -59,6 +59,7 @@ export class PersistVacantSeatController implements IController {
                 crawlingResult.performanceName,
                 crawlingResult.performanceDate,
                 crawlingResult.matineeOrSoiree,
+                crawlingResult.performanceStartTime,
                 vacantSeatInfo,
                 DetectionDatetime.fromUnixTime(unixTime)
               )

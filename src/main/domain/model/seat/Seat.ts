@@ -3,10 +3,10 @@ import { PerformanceCode } from "../../value/performance/PerformanceCode";
 import { PerformanceDate } from "../../value/performance/PerformanceDate";
 import { PerformanceId } from "../../value/performance/PerformanceId";
 import { PerformanceName } from "../../value/performance/PerformanceName";
+import { PerformanceStartTime } from "../../value/performance/PerformanceStartTime";
 import { DetectionDatetime } from "../../value/seat/DetectionDatetime";
 import { IsVacant } from "../../value/seat/IsVacant";
 import { VacantSeatInfo } from "../../value/seat/VacantSeatInfo";
-import { VacantSeatInfoList } from "../../value/seat/VacantSeatInfoList";
 import { EntityBase } from "../EntityBase";
 
 export class Seat extends EntityBase {
@@ -15,6 +15,7 @@ export class Seat extends EntityBase {
   performanceName: PerformanceName
   performanceDate: PerformanceDate
   matineeOrSoiree: MatineeOrSoiree
+  performanceStartTime: PerformanceStartTime
   seatInfo: VacantSeatInfo
   detectionDatetime: DetectionDatetime
   isVacant: IsVacant
@@ -25,6 +26,7 @@ export class Seat extends EntityBase {
     _performanceName: PerformanceName,
     _performanceDate: PerformanceDate,
     _matineeOrSoiree: MatineeOrSoiree,
+    _performanceStartTime: PerformanceStartTime,
     _seatInfo: VacantSeatInfo,
     _detectionDatetime: DetectionDatetime,
     _isVacant: IsVacant
@@ -35,6 +37,7 @@ export class Seat extends EntityBase {
     this.performanceName = _performanceName
     this.performanceDate = _performanceDate
     this.matineeOrSoiree = _matineeOrSoiree
+    this.performanceStartTime = _performanceStartTime
     this.seatInfo = _seatInfo
     this.detectionDatetime = _detectionDatetime
     this.isVacant = _isVacant
@@ -46,6 +49,7 @@ export class Seat extends EntityBase {
     performanceName: PerformanceName,
     performanceDate: PerformanceDate,
     matineeOrSoiree: MatineeOrSoiree,
+    performanceStartTime: PerformanceStartTime,
     seatInfo: VacantSeatInfo,
     detectionDatetime: DetectionDatetime
   ) {
@@ -55,6 +59,7 @@ export class Seat extends EntityBase {
       performanceName,
       performanceDate,
       matineeOrSoiree,
+      performanceStartTime,
       seatInfo,
       detectionDatetime,
       IsVacant.create(true)
