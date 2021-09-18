@@ -167,6 +167,7 @@ Resources:
       Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
+      MemorySize: 2560
 
   ######################################################
   # Event Bus
