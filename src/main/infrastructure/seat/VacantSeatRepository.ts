@@ -104,7 +104,7 @@ export class VacantSeatRepository implements ISeatRepository {
         ':pk': `${code}`,
         ':true': 'true',
       },
-      KeyConditionExpression: '#pk = :pk AND #isEnrolled = :true',
+      KeyConditionExpression: '#pk = :pk AND #isVacant = :true',
     };
 
     try {
