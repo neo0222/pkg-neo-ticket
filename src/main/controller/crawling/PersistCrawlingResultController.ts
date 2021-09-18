@@ -51,7 +51,7 @@ export class PersistCrawlingResultController implements IController {
             PerformanceDate.create(performanceDate),
             matineeOrSoiree,
             vacantSeatInfoList,
-            CrawlingDatetime.fromYYYYMMDDHHmmss(fileName.replace(/\..*/, ''))
+            CrawlingDatetime.fromYYYYMMDDHHmmss(fileName.replace(/\.txt/, ''))
           )
           this.crawlingResultRepository.save(crawlingResult)
         })())
