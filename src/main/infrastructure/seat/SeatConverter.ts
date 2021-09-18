@@ -32,7 +32,7 @@ export const SeatConverter = class SeatConverter implements IDtoConverter<SeatDt
   static toDto(entity: Seat): SeatDto {
     return new SeatDto(
       entity.performanceCode.value,
-      `${entity.performanceCode}#${entity.performanceDate}#${entity.matineeOrSoiree}`,
+      `${entity.performanceCode}#${entity.performanceDate}#${entity.matineeOrSoiree}#${entity.seatInfo.floor}#${entity.seatInfo.row}#${entity.seatInfo.column}`,
       `${entity.performanceId}`,
       `${entity.performanceCode}`,
       `${entity.performanceName}`,
