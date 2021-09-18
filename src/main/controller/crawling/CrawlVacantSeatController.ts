@@ -1,3 +1,4 @@
+import moment from "moment"
 import { BatchAssignCrawlingDetail } from "../../application/crawling/detail/BatchAssignCrawlingDetail"
 import { EventBridgeLambdaEvent } from "../../application/event-bridge/EventBridgeLambdaEvent"
 import { CrawlingResult } from "../../domain/model/crawling-result/CrawlingResult"
@@ -34,7 +35,7 @@ export class CrawlVacantSeatController implements IController {
       for (const availableDatetime of availableDatetimeList.list) {
         const vacantSeatSvg: string = await this.crawlingInvoker.getAvailableSeatSvg(session, yyyymm, availableDatetime)
         await this.s3Invoker.putObject(
-          `shiki/${performanceCode}/${availableDatetime.day}/${availableDatetime.matineeOrSoiree}/${time}.txt`,
+          `shiki/${performanceCode}/${availableDatetime.day}/${availableDatetime.matineeOrSoiree}/${moment(time, 'YYYY-MM-DDTHH:mm:ssZ').format('YYYYMMDDHHmmss')}.txt`,
           vacantSeatSvg
         )
       }
