@@ -87,7 +87,7 @@ Resources:
               - dynamodb:GetShardIterator
               - dynamodb:ListStreams
             Resource:
-              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/SEAT-${EnvName}/stream/*
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}/stream/*
 
   PutEventPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -306,7 +306,7 @@ Resources:
   LambdaPersistVacantSeatEventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping
     Properties:
-      EventSourceArn: !GetAtt SEAT.StreamArn
+      EventSourceArn: !GetAtt CRAWLING_RESULT.StreamArn
       FunctionName: !Ref LambdaPersistVacantSeat
       StartingPosition: TRIM_HORIZON
 
