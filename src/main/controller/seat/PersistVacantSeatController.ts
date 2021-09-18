@@ -71,7 +71,6 @@ export class PersistVacantSeatController implements IController {
       await Promise.all(promises)
     } catch (error) {
       console.log(error)
-      throw error
     }
   }
 
