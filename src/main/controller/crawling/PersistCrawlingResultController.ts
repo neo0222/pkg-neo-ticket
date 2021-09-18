@@ -38,7 +38,7 @@ export class PersistCrawlingResultController implements IController {
       const promises: Promise<void>[] = []
       for (const record of event.Records) {
         promises.push((async () => {
-          const objectKey: string = event.Records[0].s3.object.key
+          const objectKey: string = record.s3.object.key
           const body: Nullable<string> = await this.s3Invoker.getObject(objectKey)
           if (!body) throw SystemError.S3_ACCESS_FAILED
           const vacantSeatInfoList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(body)

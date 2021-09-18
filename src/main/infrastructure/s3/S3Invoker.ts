@@ -37,6 +37,7 @@ export class S3Invoker implements IS3Invoker {
       Key: objectKey,
     }
     try {
+      console.log(`getObject params: ${JSON.stringify(params)}`)
       const result: AWS.S3.GetObjectOutput = await this.s3.getObject(params).promise()
       return result.Body?.toString()
     } catch (error) {
