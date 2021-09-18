@@ -70,4 +70,8 @@ export class Seat extends EntityBase {
     this.isVacant = IsVacant.create(false)
     this.detectionDatetime = detectionDatetime
   }
+
+  isAppropriate(): boolean {
+    return this.seatInfo.floor.value === '1' && this.seatInfo.row.value <= '10' && '15' <= this.seatInfo.column.value && this.seatInfo.column.value <= '28'
+  }
 }
