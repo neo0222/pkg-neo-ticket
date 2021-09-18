@@ -256,6 +256,16 @@ Resources:
       Timeout: 900
       MemorySize: 2048
   
+  LambdaPersistCrawlingResultTriggerPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt 
+        - LambdaPersistCrawlingResult
+        - Arn
+      Principal: "s3.amazonaws.com"
+      SourceArn: !Sub arn:aws:s3:::${NameTag}-${EnvName}-crawling
+
   LambdaPersistVacantSeat:
     Type: AWS::Lambda::Function
     Properties:
