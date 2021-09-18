@@ -199,6 +199,8 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       }
     )
 
+    console.log(`[SUCCESS]got svg file. URL: https://tickets.shiki.jp${promise.svg}`)
+
     const svg = await htmlToJson.parse(getSvgRes.data, {
       'svg': function ($doc) {
         const seatList: VacantSeatInfo[] = []

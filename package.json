@@ -7,9 +7,11 @@
         "test": "npm run build && npm run dotenv && mocha ./dist/src/test/ --recursive && npm run clean",
         "clean": "rimraf ./dist",
         "ts": " tsc -p tsconfig.json",
+        "rm-ts": "npm rm typescript",
+        "rm-test": "rm -rf dist/src/test",
         "cp": "cp -R node_modules ./dist/node_modules",
         "dotenv": "cp ./.env-example ./.env",
-        "build": "npm run clean && npm run ts && npm run cp && rm -rf dist/src/test",
+        "build": "npm run clean && npm run ts && npm run rm-ts && npm run cp && npm run rm-test",
         "pre-build": "npm run build && npm run clean",
         "watch": "tsc -w"
     },
