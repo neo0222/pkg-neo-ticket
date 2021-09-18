@@ -167,6 +167,17 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256  
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: txt
+            Function: !GetAtt
+              - LambdaPersistCrawlingResult
+              - Arn
 
   #----------------------------------------------
   # lambda
@@ -202,7 +213,24 @@ Resources:
       Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
-      MemorySize: 2560
+      MemorySize: 300
+  
+  LambdaPersistCrawlingResult:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 空席クロール結果永続化処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-PersistCrawlingResult
+      Handler: src/main/application/crawling/PersistCrawlingResult/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 300
 
   ######################################################
   # Event Bus
