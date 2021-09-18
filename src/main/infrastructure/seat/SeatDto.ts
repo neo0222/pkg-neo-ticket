@@ -1,3 +1,4 @@
+import { Nullable } from "../../common/Nullable";
 import { MatineeOrSoiree } from "../../domain/value/performance/MatineeOrSoiree";
 import { PerformanceStartTime } from "../../domain/value/performance/PerformanceStartTime";
 import { IDto } from "../IDto";
@@ -15,7 +16,7 @@ export class SeatDto implements IDto {
   row: string
   column: string
   detectionDatetime: string
-  isVacant: string
+  isVacant: Nullable<string>
 
   constructor(
     _pk: string,
@@ -30,7 +31,7 @@ export class SeatDto implements IDto {
     _row: string,
     _column: string,
     _detectionDatetime: string,
-    _isVacant: string
+    _isVacant: Nullable<string>
   ) {
     this.pk = _pk
     this.sk = _sk

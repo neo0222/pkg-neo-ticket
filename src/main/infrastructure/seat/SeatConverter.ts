@@ -45,7 +45,7 @@ export const SeatConverter = class SeatConverter implements IDtoConverter<SeatDt
       `${entity.seatInfo.row}`,
       `${entity.seatInfo.column}`,
       `${entity.detectionDatetime}`,
-      `${entity.isVacant}`
+      `${entity.isVacant}` === 'true' ? 'true' : undefined
     )
   }
 }
