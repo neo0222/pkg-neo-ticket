@@ -73,17 +73,16 @@ export class UnvacantSeatRepository implements ISeatRepository {
   ): Promise<Optional<Seat[]>> {
     const params: AWS.DynamoDB.DocumentClient.QueryInput = {
       TableName: this.tableName,
+      IndexName: 'isVacant-sk-index',
       ExpressionAttributeNames:{
-        '#pk': 'pk',
+        '#isVacant': 'isVacant',
         '#sk': 'sk',
-        '#isVacant': 'isVacant'
       },
       ExpressionAttributeValues:{
-        ':pk': `${code.toString()}`,
-        ':skPrefix': `${code.toString()}#${date.toString()}#${matineeOrSoiree}`,
         ':false': 'false',
+        ':skPrefix': `${code.toString()}#${date.toString()}#${matineeOrSoiree}`,
       },
-      KeyConditionExpression: '#pk = :pk AND begins_with(#sk, :skPrefix) AND #isVacant = :false',
+      KeyConditionExpression: '#isVacant = :false AND begins_with(#sk, :skPrefix)',
     };
 
     try {
