@@ -222,14 +222,14 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       arrayMode: false, //"strict"
       stopNodes: ["parse-me-as-string"]
     }
-    
+
     const tObj = parser.getTraversalObj(svgData, options)
     const jsonObj = parser.convertToJson(tObj,options)
     const seatList: VacantSeatInfo[] = []
     jsonObj.svg.g[1].g.filter(seat => {
       return ['color01', 'color02'].includes(seat.circle.attr['@_class'])
     }).forEach(seat => {
-      const [ , floor, row, column, ] = seat.attr['@_id']
+      const [ , floor, row, column, ] = seat.attr['@_id'].split('-')
       seatList.push(VacantSeatInfo.create({
         floor,
         row: floorAndRowMapping[floor][row],
