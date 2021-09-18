@@ -34,7 +34,7 @@ export const CrawlingResultConverter = class CrawlingResultConverter implements 
   static toDto(entity: CrawlingResult): CrawlingResultDto {
     return new CrawlingResultDto(
       entity.performanceCode.value,
-      `${entity.performanceCode}$${entity.performanceDate}#${entity.matineeOrSoiree}`,
+      `${entity.performanceCode}#${entity.performanceDate}#${entity.matineeOrSoiree}`,
       `${entity.performanceCode}`,
       `${entity.performanceCode}`,
       `${entity.performanceName}`,
