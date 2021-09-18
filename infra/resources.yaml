@@ -466,7 +466,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       RestApiId: !Ref RestAPI
-      ParentId: !Ref ApplicantsResource
+      ParentId: !Ref SeatsResource
       PathPart: vacant
 
   SeatsVacantPostMethod:
