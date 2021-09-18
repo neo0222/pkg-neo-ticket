@@ -87,6 +87,7 @@ Resources:
               - iam:*
               - dynamodb:*
               - event:*
+              - s3:*
           - Effect: Allow
             Resource:
               - "*"

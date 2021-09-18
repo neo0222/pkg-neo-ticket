@@ -9,37 +9,34 @@ import { PerformanceId } from "../../domain/value/performance/PerformanceId"
 import { PerformanceName } from "../../domain/value/performance/PerformanceName"
 import { VacantSeatInfoList } from "../../domain/value/seat/VacantSeatInfoList"
 import { ICrawlingInvoker } from "../../gateway/ICrawlingInvoker"
+import { IS3Invoker } from "../../gateway/IS3Invoker"
 import { IController } from "../IController"
 
 export class CrawlVacantSeatController implements IController {
 
   crawlingInvoker: ICrawlingInvoker
-  crawlingResultRepository: ICrawlingResultRepository
+  s3Invoker: IS3Invoker
 
   constructor(
     crawlingInvoker: ICrawlingInvoker,
-    crawlingResultRepository: ICrawlingResultRepository
+    s3Invoker: IS3Invoker
   ) {
     this.crawlingInvoker = crawlingInvoker
-    this.crawlingResultRepository = crawlingResultRepository
+    this.s3Invoker = s3Invoker
   }
 
   async execute(event: EventBridgeLambdaEvent<BatchAssignCrawlingDetail>): Promise<any> {
     try {
+      const { time } = event
       const { performanceCode, yyyymm }: BatchAssignCrawlingDetail = event.detail
       const session: Session = await this.crawlingInvoker.getSession()
       const availableDatetimeList: PerformanceDatetimeInfoList = await this.crawlingInvoker.getAvailabledatetimeList(session, yyyymm)
       for (const availableDatetime of availableDatetimeList.list) {
-        const vacantSeatList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(session, yyyymm, availableDatetime)
-        const crawlingResult: CrawlingResult = new CrawlingResult(
-          PerformanceId.create('the-phantom-of-the-opera'), // TODO: 複数演目に対応できるようにする
-          PerformanceCode.create(performanceCode),
-          PerformanceName.create('オペラ座の怪人'), // TODO: 複数演目に対応できるようにする
-          availableDatetime.day,
-          availableDatetime.matineeOrSoiree,
-          vacantSeatList
+        const vacantSeatSvg: string = await this.crawlingInvoker.getAvailableSeatSvg(session, yyyymm, availableDatetime)
+        await this.s3Invoker.putObject(
+          `shiki/${performanceCode}/${availableDatetime.day}/${availableDatetime.matineeOrSoiree}/${time}.txt`,
+          vacantSeatSvg
         )
-        await this.crawlingResultRepository.save(crawlingResult)
       }
     } catch (error) {
       console.log(error)

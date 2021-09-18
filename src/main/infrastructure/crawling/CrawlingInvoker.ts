@@ -159,7 +159,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
     return promise.a
   }
 
-  async getAvailableSeatList(session: Session, yyyymm: string, availableDatetime: PerformanceDatetimeInfo): Promise<VacantSeatInfoList> {
+  async getAvailableSeatSvg(session: Session, yyyymm: string, availableDatetime: PerformanceDatetimeInfo): Promise<string> {
     const selectDateRes = await axiosInstance.post(
       `https://tickets.shiki.jp/ticket/RY104003.do?alctChange=0&koenDay=${availableDatetime.day}&tuyaKbn=${availableDatetime.matineeOrSoiree}`,
       {},
@@ -201,7 +201,11 @@ export class CrawlingInvoker implements ICrawlingInvoker {
 
     console.log(`[SUCCESS]got svg file. URL: https://tickets.shiki.jp${promise.svg}`)
 
-    const svg = await htmlToJson.parse(getSvgRes.data, {
+    return getSvgRes.data
+  }
+
+  async getAvailableSeatList(svgData: string): Promise<VacantSeatInfoList> {
+    const svg = await htmlToJson.parse(svgData, {
       'svg': function ($doc) {
         const seatList: VacantSeatInfo[] = []
         for (let i = 0; i < $doc.find('circle').length; i++) {

@@ -7,5 +7,6 @@ export interface ICrawlingInvoker {
   getSession(): Promise<Session>
   getYearAndMonthList(session: Session): Promise<string[]>
   getAvailabledatetimeList(session: Session, yyyymm: string): Promise<PerformanceDatetimeInfoList>
-  getAvailableSeatList(session: Session, yyyymm: string, availableDatetime: PerformanceDatetimeInfo): Promise<VacantSeatInfoList>
+  getAvailableSeatSvg(session: Session, yyyymm: string, availableDatetime: PerformanceDatetimeInfo): Promise<string>
+  getAvailableSeatList(svgData: string): Promise<VacantSeatInfoList>
 }

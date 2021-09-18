@@ -83,6 +83,21 @@ Resources:
             Resource:
               - "*"
 
+  S3Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize s3 access
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:putObject
+              - s3:Get*
+              - s3:List*
+            Resource:
+              - "*"
+              
   #-----------------------
   # ロールの作成
   #-----------------------
@@ -100,6 +115,7 @@ Resources:
         - !Ref DynamoWriteAccessPolicy
         - !Ref DynamoReadAccessPolicy
         - !Ref PutEventPolicy
+        - !Ref S3Policy
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -132,6 +148,25 @@ Resources:
         SSEEnabled: true
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
+
+  #----------------------------------------------
+  # S3 Bucket
+  #----------------------------------------------
+  S3CrawlingBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub
+        - ${NameTag}-${EnvName}-clawling
+        - {
+          NameTag: !FindInMap [ StackConfig, NameTag, Value ],
+          EnvName: !Ref EnvName
+        }
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256  
 
   #----------------------------------------------
   # lambda
