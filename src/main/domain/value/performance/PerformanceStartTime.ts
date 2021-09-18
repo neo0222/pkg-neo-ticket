@@ -26,4 +26,8 @@ export class PerformanceStartTime extends PrimitiveValueObject<moment.Moment> {
     if (result !== value) throw BusinessError.INVALID_DATE_FORMAT
     return new PerformanceStartTime(moment(value, 'HHmm').locale('ja'));
   }
+
+  formatJp(): string {
+    return this.value.format('H時MM分開演')
+  }
 }

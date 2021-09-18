@@ -196,6 +196,14 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
+        - IndexName: pk-isVacant-index
+          KeySchema:
+            - AttributeName: pk
+              KeyType: HASH
+            - AttributeName: isVacant
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
       TableName: !Sub SEAT-${EnvName}
       BillingMode: PAY_PER_REQUEST
       PointInTimeRecoverySpecification:
@@ -345,6 +353,23 @@ Resources:
       FunctionName: !Ref LambdaPersistUnvacantSeat
       StartingPosition: TRIM_HORIZON
 
+  LambdaSeatsVacantPost:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 空席取得処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-SeatsVacantPost
+      Handler: src/main/application/seat/SeatsVacantPost/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 300
+
   ######################################################
   # Event Bus
   ######################################################
@@ -401,4 +426,117 @@ Resources:
     Properties: 
       Action: lambda:InvokeFunction
       FunctionName: !Ref LambdaCrawlVacantSeat
-      Principal: events.amazonaws.com
+      Principal: events.amazonaws.com 
+      
+  ######################################################
+  # Rest API
+  ######################################################
+  RestAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub ${NameTag}-${EnvName}-api
+      EndpointConfiguration:
+        Types:
+          - EDGE
+
+  ######################################################
+  # seats
+  #   - Resource
+  #     - path: /seats
+  ######################################################
+  SeatsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestAPI
+      ParentId: !GetAtt
+        - RestAPI
+        - RootResourceId
+      PathPart: seats
+
+  ######################################################
+  # seats/vacant
+  #   - Resource
+  #     - path: /seats/vacant
+  #   - Method
+  #     - POST
+  #     - OPTION(for enable CORS)
+  #   - Lambda Permission
+  ######################################################
+  SeatsVacantResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestAPI
+      ParentId: !Ref ApplicantsResource
+      PathPart: vacant
+
+  SeatsVacantPostMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: POST
+      ResourceId: !Ref SeatsVacantResource
+      RestApiId: !Ref RestAPI
+      MethodResponses: 
+        - StatusCode: 200
+          ResponseParameters:
+            "method.response.header.Access-Control-Allow-Origin" : true
+        - StatusCode: 400 # Bad Request
+          ResponseParameters:
+            "method.response.header.Access-Control-Allow-Origin" : true
+        - StatusCode: 403 # Forbidden
+          ResponseParameters:
+            "method.response.header.Access-Control-Allow-Origin" : true
+      Integration:
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/${LambdaSeatsVacantPost.Arn}/invocations
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              'method.response.header.Access-Control-Allow-Origin' : "'*'" # 中身を一重引用符で囲う
+          - StatusCode: 400 # Bad Request
+            ResponseParameters:
+              'method.response.header.Access-Control-Allow-Origin' : "'*'" # 中身を一重引用符で囲う
+          - StatusCode: 403 # Forbidden
+            ResponseParameters:
+              'method.response.header.Access-Control-Allow-Origin' : "'*'" # 中身を一重引用符で囲う
+      AuthorizationType: NONE
+    DependsOn: LambdaSeatsVacantPostPermission
+
+  SeatsVacantOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      RestApiId:
+        Ref: RestAPI
+      ResourceId:
+        Ref: SeatsVacantResource
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+            method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+            method.response.header.Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: ''
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        Type: MOCK
+      MethodResponses:
+      - StatusCode: 200
+        ResponseModels:
+          application/json: 'Empty'
+        ResponseParameters:
+          method.response.header.Access-Control-Allow-Headers: false
+          method.response.header.Access-Control-Allow-Methods: false
+          method.response.header.Access-Control-Allow-Origin: false
+    DependsOn: SeatsVacantResource
+
+  LambdaSeatsVacantPostPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaSeatsVacantPost
+      Principal: apigateway.amazonaws.com

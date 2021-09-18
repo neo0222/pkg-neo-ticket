@@ -13,4 +13,5 @@ export interface ISeatRepository extends IRepositoryBase<Seat> {
     date: PerformanceDate,
     matineeOrSoiree: MatineeOrSoiree
   ): Promise<Optional<Seat[]>>
+  findByCode(code: PerformanceCode): Promise<Optional<Seat[]>>
 }
