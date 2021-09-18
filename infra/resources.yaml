@@ -297,7 +297,7 @@ Resources:
         Variables:
           ENV_NAME: !Ref EnvName
       FunctionName: !Sub ${NameTag}-${EnvName}-PersistVacantSeat
-      Handler: src/main/application/crawling/PersistVacantSeat/index.handler
+      Handler: src/main/application/seat/PersistVacantSeat/index.handler
       Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
