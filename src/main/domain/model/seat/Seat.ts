@@ -72,6 +72,7 @@ export class Seat extends EntityBase {
   }
 
   isAppropriate(): boolean {
-    return this.seatInfo.floor.value === '1' && this.seatInfo.row.value <= '10' && '15' <= this.seatInfo.column.value && this.seatInfo.column.value <= '28'
+    return (this.seatInfo.floor.value === '1' && this.seatInfo.row.value <= '10' && '15' <= this.seatInfo.column.value && this.seatInfo.column.value <= '28')
+     || (this.seatInfo.floor.value === '2' && this.seatInfo.row.value <= '1' && '15' <= this.seatInfo.column.value && this.seatInfo.column.value <= '28')
   }
 }
