@@ -306,7 +306,7 @@ Resources:
   LambdaPersistVacantSeatEventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping
     Properties:
-      EventSourceArn: !GetAtt CRAWLING_RESULT.StreamArn
+      EventSourceArn: !GetAtt CRAWLINGRESULT.StreamArn
       FunctionName: !Ref LambdaPersistVacantSeat
       StartingPosition: TRIM_HORIZON
 
