@@ -3,7 +3,7 @@ import { Seat } from "../../model/seat/Seat"
 export class SeatViewModel {
   name: string
   date: string
-  startime: string
+  startTime: string
   seat: string
 
   static of(seat: Seat): SeatViewModel {
@@ -13,7 +13,7 @@ export class SeatViewModel {
   constructor(seat: Seat) {
     this.name = `${seat.performanceName}`
     this.date = seat.performanceDate.formatJp()
-    this.startime = seat.performanceStartTime.formatJp()
+    this.startTime = seat.performanceStartTime.formatJp()
     this.seat = seat.seatInfo.format
   }
 }

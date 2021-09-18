@@ -28,6 +28,6 @@ export class PerformanceStartTime extends PrimitiveValueObject<moment.Moment> {
   }
 
   formatJp(): string {
-    return this.value.format('H時MM分開演')
+    return this.value.format('H時mm分開演')
   }
 }
