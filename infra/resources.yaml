@@ -53,6 +53,7 @@ Resources:
               - dynamodb:DeleteItem
             Resource:
               - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/SEAT-${EnvName}
 
   DynamoReadAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -69,6 +70,24 @@ Resources:
             Resource:
               - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}
               - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}/index/*
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/SEAT-${EnvName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/SEAT-${EnvName}/index/*
+
+  DynamoDBStreamReadPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize to read dynamodb stream
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:DescribeStream
+              - dynamodb:GetRecords
+              - dynamodb:GetShardIterator
+              - dynamodb:ListStreams
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/SEAT-${EnvName}/stream/*
 
   PutEventPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -114,6 +133,7 @@ Resources:
         - !FindInMap [StackConfig, ManagedPolicyArns, AWSLambdaBasicExecutionRole]
         - !Ref DynamoWriteAccessPolicy
         - !Ref DynamoReadAccessPolicy
+        - !Ref DynamoDBStreamReadPolicy
         - !Ref PutEventPolicy
         - !Ref S3Policy
       AssumeRolePolicyDocument:
