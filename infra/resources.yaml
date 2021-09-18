@@ -310,6 +310,30 @@ Resources:
       FunctionName: !Ref LambdaPersistVacantSeat
       StartingPosition: TRIM_HORIZON
 
+  LambdaPersistUnvacantSeat:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 空席永続化処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-PersistUnvacantSeat
+      Handler: src/main/application/seat/PersistUnvacantSeat/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 300
+
+  LambdaPersistUnvacantSeatEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt CRAWLINGRESULT.StreamArn
+      FunctionName: !Ref LambdaPersistUnvacantSeat
+      StartingPosition: TRIM_HORIZON
+
   ######################################################
   # Event Bus
   ######################################################
