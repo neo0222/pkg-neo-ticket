@@ -107,9 +107,16 @@ export class VacantSeatRepository implements ISeatRepository {
       KeyConditionExpression: '#pk = :pk AND #isVacant = :true',
     };
 
+    let dtoList: SeatDto[] = []
     try {
-      const result: AWS.DynamoDB.DocumentClient.QueryOutput = await this.docClient.query(params).promise();
-      return Optional.ofNullable(result.Items ? result.Items.map(dto => SeatConverter.toEntity(dto as SeatDto)) : undefined)
+      while (true) {
+        const result: AWS.DynamoDB.DocumentClient.QueryOutput = await this.docClient.query(params).promise();
+        if (!result.Items) throw SystemError.DYNAMO_ACCESS_FAILED
+        dtoList = dtoList.concat(result.Items as SeatDto[])
+        if (!result.LastEvaluatedKey) break
+        params.ExclusiveStartKey = result.LastEvaluatedKey
+      }
+      return Optional.ofNullable(dtoList.map(dto => SeatConverter.toEntity(dto)))
     }
     catch (error: any) {
       console.error(error)
