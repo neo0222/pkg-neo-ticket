@@ -5,6 +5,7 @@ export class SeatViewModel {
   date: string
   startTime: string
   seat: string
+  updatedAt: string
 
   static of(seat: Seat): SeatViewModel {
     return new SeatViewModel(seat)
@@ -15,5 +16,6 @@ export class SeatViewModel {
     this.date = seat.performanceDate.formatJp()
     this.startTime = seat.performanceStartTime.formatJp()
     this.seat = seat.seatInfo.format
+    this.updatedAt = seat.detectionDatetime.ISO8601()
   }
 }

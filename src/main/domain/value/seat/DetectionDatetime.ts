@@ -21,4 +21,8 @@ export class DetectionDatetime extends PrimitiveValueObject<moment.Moment> {
   toString(): string {
     return this.format()
   }
+
+  ISO8601(): string {
+    return this.value.toISOString()
+  }
 }
