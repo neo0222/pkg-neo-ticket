@@ -44,14 +44,14 @@ export class PersistCrawlingResultController implements IController {
           const body: Nullable<string> = await this.s3Invoker.getObject(objectKey)
           if (!body) throw SystemError.S3_ACCESS_FAILED
           const vacantSeatInfoList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(body)
-          const [ , performanceCode, performanceDate, matineeOrSoiree, startTime, fileName ]: [ string, string, string, MatineeOrSoiree, string, string ] = objectKey.split('/') as [ string, string, string, MatineeOrSoiree, string, string ]
+          const [ , performanceCode, performanceDate, matineeOrSoiree, startTimeWithoutColon, fileName ]: [ string, string, string, MatineeOrSoiree, string, string ] = objectKey.split('/') as [ string, string, string, MatineeOrSoiree, string, string ]
           const crawlingResult: CrawlingResult = new CrawlingResult(
             PerformanceId.create('the-phantom-of-the-opera'), // TODO: 複数演目に対応できるようにする
             PerformanceCode.create(performanceCode),
             PerformanceName.create('オペラ座の怪人'), // TODO: 複数演目に対応できるようにする
             PerformanceDate.create(performanceDate),
             matineeOrSoiree,
-            PerformanceStartTime.create(startTime),
+            PerformanceStartTime.fromHHmm(startTimeWithoutColon),
             vacantSeatInfoList
           )
           this.crawlingResultRepository.save(crawlingResult)

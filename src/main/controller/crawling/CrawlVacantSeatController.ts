@@ -29,7 +29,7 @@ export class CrawlVacantSeatController implements IController {
       for (const availableDatetime of availableDatetimeList.list) {
         const vacantSeatSvg: string = await this.crawlingInvoker.getAvailableSeatSvg(session, yyyymm, availableDatetime)
         await this.s3Invoker.putObject(
-          `shiki/${performanceCode}/${availableDatetime.day}/${availableDatetime.matineeOrSoiree}/${availableDatetime.startTime}/${moment(time, 'YYYY-MM-DDTHH:mm:ssZ').format('YYYYMMDDHHmmss')}.txt`,
+          `shiki/${performanceCode}/${availableDatetime.day}/${availableDatetime.matineeOrSoiree}/${availableDatetime.startTime.HHmm()}/${moment(time, 'YYYY-MM-DDTHH:mm:ssZ').format('YYYYMMDDHHmmss')}.txt`,
           vacantSeatSvg
         )
       }

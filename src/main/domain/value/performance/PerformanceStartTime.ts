@@ -16,4 +16,14 @@ export class PerformanceStartTime extends PrimitiveValueObject<moment.Moment> {
   toString(): string {
     return this.format()
   }
+
+  HHmm(): string {
+    return this._value.format('HHmm')
+  }
+
+  static fromHHmm(value: string) :PerformanceStartTime {
+    const result: string = moment(value, 'HHmm').locale('ja').format('HHmm')
+    if (result !== value) throw BusinessError.INVALID_DATE_FORMAT
+    return new PerformanceStartTime(moment(value, 'HHmm').locale('ja'));
+  }
 }
