@@ -10,6 +10,7 @@ import { PerformanceDatetimeInfo } from "../../domain/value/performance/Performa
 import { PerformanceDatetimeInfoList } from "../../domain/value/performance/PerformanceDatetimeInfoList";
 import { VacantSeatInfoList } from "../../domain/value/seat/VacantSeatInfoList";
 import { VacantSeatInfo } from "../../domain/value/seat/VacantSeatInfo";
+import * as parser from 'fast-xml-parser'
 
 const floorAndRowMapping = {
   '1': [
@@ -205,26 +206,41 @@ export class CrawlingInvoker implements ICrawlingInvoker {
   }
 
   async getAvailableSeatList(svgData: string): Promise<VacantSeatInfoList> {
-    const svg = await htmlToJson.parse(svgData, {
-      'svg': function ($doc) {
-        const seatList: VacantSeatInfo[] = []
-        for (let i = 0; i < $doc.find('circle').length; i++) {
-          if (['color01', 'color02'].includes($doc.find('circle')[i].attribs.class)) {
-            const [ , floor, row, column, ] = $doc.find('circle')[i].attribs.id.split('-')
-            seatList.push(VacantSeatInfo.create({
-              floor,
-              row: floorAndRowMapping[floor][row],
-              column: columnMapping[column],
-            }))
-          }
-        }
-        return VacantSeatInfoList.create({
-          list: seatList,
-        })
-      }
+    const options: parser.X2jOptionsOptional = {
+      attributeNamePrefix : "@_",
+      attrNodeName: "attr", //default is 'false'
+      textNodeName : "#text",
+      ignoreAttributes : false,
+      ignoreNameSpace : false,
+      allowBooleanAttributes : false,
+      parseNodeValue : true,
+      parseAttributeValue : true,
+      trimValues: true,
+      cdataTagName: "__cdata", //default is 'false'
+      cdataPositionChar: "\\c",
+      parseTrueNumberOnly: false,
+      arrayMode: false, //"strict"
+      stopNodes: ["parse-me-as-string"]
+    }
+    
+    const tObj = parser.getTraversalObj(svgData, options)
+    const jsonObj = parser.convertToJson(tObj,options)
+    const seatList: VacantSeatInfo[] = []
+    jsonObj.svg.g[1].g.filter(seat => {
+      return ['color01', 'color02'].includes(seat.circle.attr['@_class'])
+    }).forEach(seat => {
+      const [ , floor, row, column, ] = seat.attr['@_id']
+      seatList.push(VacantSeatInfo.create({
+        floor,
+        row: floorAndRowMapping[floor][row],
+        column: columnMapping[column],
+      }))
+    });
+    console.log(`[SUCCESS]collected available seat. count: ${seatList.length}`)
+
+    return VacantSeatInfoList.create({
+      list: seatList,
     })
-    console.log(`[SUCCESS]collected available seat. count: ${svg.svg.length}`)
-    return svg.svg
   }
 
   createHeadersForPost(skSession, jSessionId, bigIpKeyValueJoinWithEqual, referer) {

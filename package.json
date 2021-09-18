@@ -43,6 +43,7 @@
         "bignumber.js": "^9.0.1",
         "builder-pattern": "^1.2.4",
         "crypto-js": "^4.0.0",
+        "fast-xml-parser": "^3.20.0",
         "google-auth-library": "^7.0.4",
         "googleapis": "^71.0.0",
         "html-to-json": "^0.6.0",
