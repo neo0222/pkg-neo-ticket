@@ -154,6 +154,7 @@ Resources:
   #----------------------------------------------
   S3CrawlingBucket:
     Type: 'AWS::S3::Bucket'
+    DependsOn: LambdaPersistCrawlingResultTriggerPermission
     Properties:
       BucketName: !Sub
         - ${NameTag}-${EnvName}-crawling
@@ -232,7 +233,7 @@ Resources:
       Timeout: 900
       MemorySize: 300
   
-  TriggerLambdaPermission:
+  LambdaPersistCrawlingResultTriggerPermission:
     Type: "AWS::Lambda::Permission"
     Properties:
       Action: "lambda:InvokeFunction"
