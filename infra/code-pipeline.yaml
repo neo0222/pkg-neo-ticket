@@ -48,7 +48,7 @@ Mappings:
     staging5:
       PollForSourceChanges: true
     prod:
-      PollForSourceChanges: false
+      PollForSourceChanges: true
 
 ######################################################
 # Resources

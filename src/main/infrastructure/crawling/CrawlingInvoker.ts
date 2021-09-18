@@ -212,7 +212,9 @@ export class CrawlingInvoker implements ICrawlingInvoker {
             }))
           }
         }
-        return seatList
+        return VacantSeatInfoList.create({
+          list: seatList,
+        })
       }
     })
     console.log(`[SUCCESS]collected available seat. count: ${svg.svg.length}`)
