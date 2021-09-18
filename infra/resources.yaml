@@ -156,7 +156,7 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Sub
-        - ${NameTag}-${EnvName}-clawling
+        - ${NameTag}-${EnvName}-crawling
         - {
           NameTag: !FindInMap [ StackConfig, NameTag, Value ],
           EnvName: !Ref EnvName
