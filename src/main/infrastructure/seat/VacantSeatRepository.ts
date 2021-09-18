@@ -21,8 +21,6 @@ export class VacantSeatRepository implements ISeatRepository {
     const envName = process.env.ENV_NAME || 'local'
     this.tableName = `${this.TABLE_NAME_PREFIX}-${envName}`;
 
-    this.dynamoAccessor = new DynamoAccessor(this.tableName);
-
     if (envName === 'local') {
       const serviceConfigOptions: ServiceConfigurationOptions = {
         accessKeyId: 'dummy',
