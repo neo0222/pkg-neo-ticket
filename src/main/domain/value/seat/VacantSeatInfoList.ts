@@ -1,3 +1,4 @@
+import { Seat } from "../../model/seat/Seat";
 import { ValueObject } from "../ValueObject";
 import { VacantSeatInfo } from "./VacantSeatInfo";
 
@@ -22,6 +23,12 @@ export class VacantSeatInfoList extends ValueObject<VacantSeatInfoListProps> {
 
   isEmpty(): boolean {
     return this.list.length === 0
+  }
+
+  includes(seat: Seat): boolean {
+    return this.list.some(vacantSeat => {
+      return vacantSeat.equals(seat.seatInfo)
+    })
   }
 
 }

@@ -12,7 +12,7 @@ import { DynamoAccessor } from "../util/DynamoAccessor";
 import { SeatConverter } from "./SeatConverter";
 import { SeatDto } from "./SeatDto";
 
-export class VacantSeatRepository implements ISeatRepository {
+export class UnvacantSeatRepository implements ISeatRepository {
 
   dynamoAccessor: DynamoAccessor
 
@@ -49,10 +49,10 @@ export class VacantSeatRepository implements ISeatRepository {
         '#isVacant': 'isVacant',
       },
       ExpressionAttributeValues: {
-        ':false': 'false',
+        ':true': 'true',
       },
       Item: dto as AWS.DynamoDB.DocumentClient.ItemCollectionKeyAttributeMap,
-      ConditionExpression: 'attribute_not_exists(#pk) OR #isVacant=:false'
+      ConditionExpression: 'attribute_not_exists(#pk) OR #isVacant=:true'
     }
     try {
       await this.docClient.put(params).promise();
@@ -81,9 +81,9 @@ export class VacantSeatRepository implements ISeatRepository {
       ExpressionAttributeValues:{
         ':pk': `${code.toString()}`,
         ':skPrefix': `${code.toString()}#${date.toString()}#${matineeOrSoiree}`,
-        ':true': 'true',
+        ':false': 'false',
       },
-      KeyConditionExpression: '#pk = :pk AND begins_with(#sk, :skPrefix) AND #isVacant = :true',
+      KeyConditionExpression: '#pk = :pk AND begins_with(#sk, :skPrefix) AND #isVacant = :false',
     };
 
     try {

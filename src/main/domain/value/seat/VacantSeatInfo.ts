@@ -40,4 +40,8 @@ export class VacantSeatInfo extends ValueObject<VacantSeatInfoProps> {
     return `${this.floor}階${this.row}列${this.column}番`
   }
 
+  equals(other: VacantSeatInfo): boolean {
+    return this.floor.equals(other.floor) && this.row.equals(other.row) && this.column.equals(other.column)
+  }
+
 }

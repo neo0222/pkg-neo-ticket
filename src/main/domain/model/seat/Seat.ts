@@ -60,4 +60,9 @@ export class Seat extends EntityBase {
       IsVacant.create(true)
     )
   }
+
+  makeUnvacant(detectionDatetime: DetectionDatetime): void {
+    this.isVacant = IsVacant.create(false)
+    this.detectionDatetime = detectionDatetime
+  }
 }

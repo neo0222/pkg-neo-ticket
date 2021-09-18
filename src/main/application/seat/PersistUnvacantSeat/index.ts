@@ -1,16 +1,18 @@
 import { CrawlingResultRepository } from "../../../infrastructure/crawling-result/CrawlingResultRepository";
 import { LambdaFunction } from "../../LambdaFunction";
 import { DynamoDBStreamEvent } from "aws-lambda";
-import { PersistVacantSeatController } from "../../../controller/seat/PersistVacantSeatController";
 import { VacantSeatRepository } from "../../../infrastructure/seat/VacantSeatRepository";
+import { UnvacantSeatRepository } from "../../../infrastructure/seat/UnvacantSeatRepository";
+import { PersistUnvacantSeatController } from "../../../controller/seat/PersistUnvacantSeatController";
 
 exports.handler = async (event, context) => {
   let controller
   let lambda
 
-  controller = new PersistVacantSeatController(
+  controller = new PersistUnvacantSeatController(
     new CrawlingResultRepository(),
-    new VacantSeatRepository()
+    new VacantSeatRepository(),
+    new UnvacantSeatRepository()
   )
   lambda = new LambdaFunction<DynamoDBStreamEvent, any>(controller)
 
