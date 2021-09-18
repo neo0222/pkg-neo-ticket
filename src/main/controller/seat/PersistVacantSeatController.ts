@@ -40,6 +40,7 @@ export class PersistVacantSeatController implements IController {
     try {
       const promises: Promise<void>[] = []
       for (const record of event.Records) {
+        if (record.eventName !== 'INSERT') continue
         promises.push((async () => {
           if (record.dynamodb?.NewImage?.performanceCode?.S === undefined) throw BusinessError.PERFORMANCE_CODE_NOT_GIVEN
           if (record.dynamodb?.NewImage?.performanceDate?.S === undefined) throw BusinessError.PERFORMANCE_DATE_NOT_GIVEN
