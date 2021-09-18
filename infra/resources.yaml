@@ -52,7 +52,7 @@ Resources:
               - dynamodb:UpdateItem
               - dynamodb:DeleteItem
             Resource:
-              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/MAIN-${EnvName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}
 
   DynamoReadAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -67,8 +67,8 @@ Resources:
               - dynamodb:Scan
               - dynamodb:Query
             Resource:
-              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/MAIN-${EnvName}
-              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/MAIN-${EnvName}/index/*
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}/index/*
 
   PutEventPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -109,7 +109,7 @@ Resources:
               Service: lambda.amazonaws.com
 
   #----------------------------------------------
-  # MAIN
+  # CRAWLING_RESULT
   #----------------------------------------------
   CRAWLINGRESULT:
     Type: AWS::DynamoDB::Table

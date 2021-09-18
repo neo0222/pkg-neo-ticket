@@ -9,10 +9,12 @@ export class DynamoAccessor {
 
   private tableName: string
 
-  constructor() {
-    const envName = process.env.ENV_NAME || 'local'
-    this.tableName = `MAIN-${envName}`;
+  constructor(
+    tableName: string
+  ) {
+    this.tableName = tableName;
 
+    const envName = process.env.ENV_NAME || 'local'
     if (envName === 'local') {
       const serviceConfigOptions: ServiceConfigurationOptions = {
         accessKeyId: 'dummy',
