@@ -1,9 +1,7 @@
 import { MatineeOrSoiree } from "../../domain/value/performance/MatineeOrSoiree";
-import { ICrawlingInvoker } from "../../gateway/ICrawlingInvoker";
 import { IDto } from "../IDto";
-import { VacantSeatInfoDto } from "./VacantSeatInfoDto";
 
-export class CrawlingResultDto implements IDto {
+export class SeatDto implements IDto {
   pk: string
   sk: string
   performanceId: string
@@ -11,8 +9,11 @@ export class CrawlingResultDto implements IDto {
   performanceName: string
   performanceDate: string
   matineeOrSoiree: MatineeOrSoiree
-  vacantSeatInfoList: VacantSeatInfoDto[]
-  crawlingDatetime: string
+  floor: string
+  row: string
+  column: string
+  detectionDatetime: string
+  isVacant: string
 
   constructor(
     _pk: string,
@@ -22,8 +23,11 @@ export class CrawlingResultDto implements IDto {
     _performanceName: string,
     _performanceDate: string,
     _matineeOrSoiree: MatineeOrSoiree,
-    _vacantSeatInfoList: VacantSeatInfoDto[],
-    _crawlingDatetime: string
+    _floor: string,
+    _row: string,
+    _column: string,
+    _detectionDatetime: string,
+    _isVacant: string
   ) {
     this.pk = _pk
     this.sk = _sk
@@ -32,7 +36,10 @@ export class CrawlingResultDto implements IDto {
     this.performanceName = _performanceName
     this.performanceDate = _performanceDate
     this.matineeOrSoiree = _matineeOrSoiree
-    this.vacantSeatInfoList = _vacantSeatInfoList
-    this.crawlingDatetime = _crawlingDatetime
+    this.floor = _floor
+    this.row = _row
+    this.column = _column
+    this.detectionDatetime = _detectionDatetime
+    this.isVacant = _isVacant
   }
 }

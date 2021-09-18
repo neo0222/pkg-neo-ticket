@@ -1,4 +1,5 @@
 import { CrawlingResult } from "../../domain/model/crawling-result/CrawlingResult";
+import { CrawlingDatetime } from "../../domain/value/crawling/CrawlingDatetime";
 import { PerformanceCode } from "../../domain/value/performance/PerformanceCode";
 import { PerformanceDate } from "../../domain/value/performance/PerformanceDate";
 import { PerformanceId } from "../../domain/value/performance/PerformanceId";
@@ -27,7 +28,8 @@ export const CrawlingResultConverter = class CrawlingResultConverter implements 
             column: vacantSeat.column,
           })
         })
-      })
+      }),
+      CrawlingDatetime.create(dto.crawlingDatetime)
     )
   }
 
@@ -35,7 +37,7 @@ export const CrawlingResultConverter = class CrawlingResultConverter implements 
     return new CrawlingResultDto(
       entity.performanceCode.value,
       `${entity.performanceCode}#${entity.performanceDate}#${entity.matineeOrSoiree}`,
-      `${entity.performanceCode}`,
+      `${entity.performanceId}`,
       `${entity.performanceCode}`,
       `${entity.performanceName}`,
       `${entity.performanceDate}`,
@@ -48,7 +50,8 @@ export const CrawlingResultConverter = class CrawlingResultConverter implements 
           `${vacantSeatInfo.row}`,
           `${vacantSeatInfo.column}`,
         )
-      })
+      }),
+      `${entity.crawlingDatetime}`
     )
   }
 }

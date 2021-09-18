@@ -150,6 +150,31 @@ Resources:
         StreamViewType: NEW_AND_OLD_IMAGES
 
   #----------------------------------------------
+  # SEAT
+  #----------------------------------------------
+  SEAT:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      TableName: !Sub SEAT-${EnvName}
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  #----------------------------------------------
   # S3 Bucket
   #----------------------------------------------
   S3CrawlingBucket:
@@ -229,17 +254,31 @@ Resources:
       Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
-      MemorySize: 300
+      MemorySize: 2048
   
-  LambdaPersistCrawlingResultTriggerPermission:
-    Type: "AWS::Lambda::Permission"
+  LambdaPersistVacantSeat:
+    Type: AWS::Lambda::Function
     Properties:
-      Action: "lambda:InvokeFunction"
-      FunctionName: !GetAtt 
-        - LambdaPersistCrawlingResult
-        - Arn
-      Principal: "s3.amazonaws.com"
-      SourceArn: !Sub arn:aws:s3:::${NameTag}-${EnvName}-crawling
+      Description: 空席永続化処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-PersistVacantSeat
+      Handler: src/main/application/crawling/PersistVacantSeat/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 300
+
+  LambdaPersistVacantSeatEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt SEAT.StreamArn
+      FunctionName: !Ref LambdaPersistVacantSeat
+      StartingPosition: TRIM_HORIZON
 
   ######################################################
   # Event Bus

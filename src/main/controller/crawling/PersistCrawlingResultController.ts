@@ -6,6 +6,7 @@ import { SystemError } from "../../common/SystemError"
 import { CrawlingResult } from "../../domain/model/crawling-result/CrawlingResult"
 import { Session } from "../../domain/model/session/Session"
 import { ICrawlingResultRepository } from "../../domain/repository/crawling-result/ICrawlingResultRepository"
+import { CrawlingDatetime } from "../../domain/value/crawling/CrawlingDatetime"
 import { MatineeOrSoiree } from "../../domain/value/performance/MatineeOrSoiree"
 import { PerformanceCode } from "../../domain/value/performance/PerformanceCode"
 import { PerformanceDate } from "../../domain/value/performance/PerformanceDate"
@@ -42,14 +43,15 @@ export class PersistCrawlingResultController implements IController {
           const body: Nullable<string> = await this.s3Invoker.getObject(objectKey)
           if (!body) throw SystemError.S3_ACCESS_FAILED
           const vacantSeatInfoList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(body)
-          const [ , performanceCode, performanceDate, matineeOrSoiree, ]: [ string, string, string, MatineeOrSoiree, ] = objectKey.split('/') as [ string, string, string, MatineeOrSoiree, ]
+          const [ , performanceCode, performanceDate, matineeOrSoiree, fileName ]: [ string, string, string, MatineeOrSoiree, string ] = objectKey.split('/') as [ string, string, string, MatineeOrSoiree, string ]
           const crawlingResult: CrawlingResult = new CrawlingResult(
             PerformanceId.create('the-phantom-of-the-opera'), // TODO: 複数演目に対応できるようにする
             PerformanceCode.create(performanceCode),
             PerformanceName.create('オペラ座の怪人'), // TODO: 複数演目に対応できるようにする
             PerformanceDate.create(performanceDate),
             matineeOrSoiree,
-            vacantSeatInfoList
+            vacantSeatInfoList,
+            CrawlingDatetime.fromYYYYMMDDHHmmss(fileName.replace(/\..*/, ''))
           )
           this.crawlingResultRepository.save(crawlingResult)
         })())
