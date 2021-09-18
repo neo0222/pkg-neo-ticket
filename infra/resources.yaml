@@ -152,33 +152,31 @@ Resources:
   #----------------------------------------------
   # S3 Bucket
   #----------------------------------------------
-  # S3CrawlingBucket:
-  #   Type: 'AWS::S3::Bucket'
-  #   DependsOn: LambdaPersistCrawlingResultTriggerPermission
-  #   Properties:
-  #     BucketName: !Sub
-  #       - ${NameTag}-${EnvName}-crawling
-  #       - {
-  #         NameTag: !FindInMap [ StackConfig, NameTag, Value ],
-  #         EnvName: !Ref EnvName
-  #       }
-  #     VersioningConfiguration:
-  #       Status: Enabled
-  #     BucketEncryption:
-  #       ServerSideEncryptionConfiguration:
-  #         - ServerSideEncryptionByDefault:
-  #             SSEAlgorithm: AES256  
-  #     NotificationConfiguration:
-  #       LambdaConfigurations:
-  #         - Event: "s3:ObjectCreated:*"
-  #           Filter:
-  #             S3Key:
-  #               Rules:
-  #                 - Name: suffix
-  #                   Value: txt
-  #           Function: !GetAtt
-  #             - LambdaPersistCrawlingResult
-  #             - Arn
+  S3CrawlingBucket:
+    Type: 'AWS::S3::Bucket'
+    DependsOn: LambdaPersistCrawlingResultTriggerPermission
+    Properties:
+      BucketName: !Sub
+        - ${NameTag}-${EnvName}-crawling
+        - {
+          NameTag: !FindInMap [ StackConfig, NameTag, Value ],
+          EnvName: !Ref EnvName
+        }
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256  
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: txt
+            Function: !GetAtt
+              - LambdaPersistCrawlingResult
+              - Arn
 
   #----------------------------------------------
   # lambda
