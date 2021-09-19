@@ -7,9 +7,11 @@
         "test": "npm run build && npm run dotenv && mocha ./dist/src/test/ --recursive && npm run clean",
         "clean": "rimraf ./dist",
         "ts": " tsc -p tsconfig.json",
+        "rm-ts": "npm rm typescript",
+        "rm-test": "rm -rf dist/src/test",
         "cp": "cp -R node_modules ./dist/node_modules",
         "dotenv": "cp ./.env-example ./.env",
-        "build": "npm run clean && npm run ts && npm run cp && rm -rf dist/src/test",
+        "build": "npm run clean && npm run ts && npm run rm-ts && npm run cp && npm run rm-test",
         "pre-build": "npm run build && npm run clean",
         "watch": "tsc -w"
     },
@@ -32,6 +34,7 @@
         "ts-node": "^8.10.2"
     },
     "dependencies": {
+        "@types/aws-lambda": "^8.10.83",
         "@types/bignumber.js": "^5.0.0",
         "@types/crypto-js": "^4.0.1",
         "@types/moment": "^2.13.0",
@@ -40,8 +43,10 @@
         "bignumber.js": "^9.0.1",
         "builder-pattern": "^1.2.4",
         "crypto-js": "^4.0.0",
+        "fast-xml-parser": "^3.20.0",
         "google-auth-library": "^7.0.4",
         "googleapis": "^71.0.0",
+        "html-to-json": "^0.6.0",
         "jsonwebtoken": "^8.5.1",
         "jwk-to-pem": "^2.0.4",
         "mocha": "^8.2.1",

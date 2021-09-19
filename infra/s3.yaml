@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: 2010-09-09
+######################################################
+# Parameters:
+######################################################
+Parameters:
+  EnvName:
+    Type: String
+    AllowedValues:
+      - dev
+      - staging1
+      - staging2
+      - staging3
+      - staging4
+      - staging5
+      - prod
+    Description: Enter profile.
+
+######################################################
+# Mappings:
+######################################################
+Mappings:
+  StackConfig:
+    NameTag:
+      Value: neo-ticket
+
+######################################################
+# Resources
+######################################################
+Resources:
+  S3ReleaseBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub
+        - ${NameTag}-${EnvName}-release
+        - {
+          NameTag: !FindInMap [ StackConfig, NameTag, Value ],
+          EnvName: !Ref EnvName
+        }
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256  
+      # LifecycleConfiguration:
+      #   Rules:
+      #     - Id: !Join ['-', [!Ref 'BucketNameContents', 'Contents-LifeCycle']]
+      #       Status: Enabled
+      #       # バージョニングされているデータは180日経過したらS3 glacierに移行する
+      #       NoncurrentVersionTransition:
+      #           StorageClass: GLACIER
+      #           TransitionInDays: 180
+      #       # バージョニングされているデータは365日経過したら削除する
+      #       NoncurrentVersionExpirationInDays: 365

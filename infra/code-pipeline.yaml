@@ -1,0 +1,212 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+######################################################
+# Parameters:
+######################################################
+Parameters:
+  GitHubRepoName:
+    Type: String
+    Default: pkg-neo-ticket
+  GitHubBranchName:
+    Type: String
+    Default: dev
+  GitHubOAuthToken:
+    Type: String
+  NameTag:
+    Type: String
+    Default: neo-ticket
+    AllowedValues:
+      - neo-ticket
+  EnvName:
+    Type: String
+    AllowedValues:
+      - dev
+      - staging1
+      - staging2
+      - staging3
+      - staging4
+      - staging5
+      - prod
+    Description: Enter profile.
+
+######################################################
+# Mappings
+######################################################
+Mappings:
+  EnvironmentToParams:
+    dev:
+      PollForSourceChanges: true
+    staging1:
+      PollForSourceChanges: true
+    staging2:
+      PollForSourceChanges: true
+    staging3:
+      PollForSourceChanges: true
+    staging4:
+      PollForSourceChanges: true
+    staging5:
+      PollForSourceChanges: true
+    prod:
+      PollForSourceChanges: true
+
+######################################################
+# Resources
+######################################################
+Resources:
+  CodeBuildBasePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${NameTag}-${EnvName}-build
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${NameTag}-${EnvName}-build:*
+          - Effect: Allow
+            Resource:
+              - !Sub arn:aws:s3:::${NameTag}-${EnvName}-release/*
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:GetObjectVersion
+              - s3:GetBucketAcl
+              - s3:GetBucketLocation
+          - Effect: Allow
+            Resource:
+              - "*"
+            Action:
+              - cloudformation:*
+              - apigateway:*
+              - events:*
+              - iam:*
+              - dynamodb:*
+              - event:*
+              - s3:*
+          - Effect: Allow
+            Resource:
+              - "*"
+            Action:
+              - lambda:*
+          - Effect: Allow
+            Resource:
+              - "*"
+            Action:
+              - iam:PassRole
+
+  RoleCodeBuildService:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub role-${NameTag}-${EnvName}-codebuild
+      ManagedPolicyArns:
+        - !Ref CodeBuildBasePolicy
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: codebuild.amazonaws.com
+
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        EnvironmentVariables:
+          - Name: ENVIRONMENT_NAME
+            Value: !Ref EnvName
+          - Name: NAME_TAG
+            Value: !Ref NameTag
+        Type: LINUX_CONTAINER
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+      ServiceRole: !GetAtt RoleCodeBuildService.Arn
+      Name: !Sub ${NameTag}-${EnvName}-build
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: buildspec.yml
+
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub role-${NameTag}-${EnvName}-deploy-code-pipeline
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SamplePipelinePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource:
+                  - !Sub arn:aws:s3:::${NameTag}-${EnvName}-release/*
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - cloudformation:*
+                  - codedeploy:*
+                  - codebuild:*
+                  - s3:*
+                  - iam:PassRole
+
+  NeoTicketPipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub ${NameTag}-${EnvName}-deploy-code-pipeline
+      ArtifactStore:
+        Type: S3
+        Location: !Sub ${NameTag}-${EnvName}-release
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      RestartExecutionOnUpdate: false
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+                Version : 1
+              Configuration:
+                Owner: neo0222
+                Repo: !Ref GitHubRepoName
+                Branch: !Ref GitHubBranchName
+                OAuthToken: !Ref GitHubOAuthToken #GitHubでPersonal Access Tokenを発行する。
+                PollForSourceChanges: !FindInMap [ EnvironmentToParams, !Ref EnvName, PollForSourceChanges]
+              OutputArtifacts:
+                - Name: SourceArtifact
+              Region: ap-northeast-1
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref BuildProject
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts:
+                - Name: BuildArtifacts
+              RunOrder: 1

@@ -1,0 +1,542 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+######################################################
+# Parameters:
+######################################################
+Parameters:
+  ObjectKeyPrefix:
+    Type: String
+  EnvName:
+    Type: String
+    AllowedValues:
+      - dev
+      - staging1
+      - staging2
+      - staging3
+      - staging4
+      - staging5
+      - prod
+    Description: Enter profile.
+  NameTag:
+    Type: String
+    Default: neo-ticket
+    AllowedValues:
+      - neo-ticket
+######################################################
+# Mappings:
+######################################################
+Mappings:
+  StackConfig:
+    ManagedPolicyArns:
+      AWSLambdaBasicExecutionRole: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    NameTag:
+      Value: neo-ticket
+
+######################################################
+# Resources:
+######################################################
+Resources:
+  #-----------------------
+  # ポリシー作成
+  #-----------------------
+  DynamoWriteAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize to write item into main dynamodb 
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/SEAT-${EnvName}
+
+  DynamoReadAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize to get item from user dynamodb 
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:Query
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}/index/*
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/SEAT-${EnvName}
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/SEAT-${EnvName}/index/*
+
+  DynamoDBStreamReadPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize to read dynamodb stream
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:DescribeStream
+              - dynamodb:GetRecords
+              - dynamodb:GetShardIterator
+              - dynamodb:ListStreams
+            Resource:
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}/stream/*
+
+  PutEventPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize to full access to sqs
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - events:PutEvents
+            Resource:
+              - "*"
+
+  S3Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize s3 access
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:putObject
+              - s3:Get*
+              - s3:List*
+            Resource:
+              - "*"
+              
+  #-----------------------
+  # ロールの作成
+  #-----------------------
+  RoleLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - ${NameTag}-${EnvName}-lambda-role
+        - {
+          NameTag: !FindInMap [ StackConfig, NameTag, Value ],
+          EnvName: !Ref EnvName
+        }
+      ManagedPolicyArns:
+        - !FindInMap [StackConfig, ManagedPolicyArns, AWSLambdaBasicExecutionRole]
+        - !Ref DynamoWriteAccessPolicy
+        - !Ref DynamoReadAccessPolicy
+        - !Ref DynamoDBStreamReadPolicy
+        - !Ref PutEventPolicy
+        - !Ref S3Policy
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              Service: lambda.amazonaws.com
+
+  #----------------------------------------------
+  # CRAWLING_RESULT
+  #----------------------------------------------
+  CRAWLINGRESULT:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      TableName: !Sub CRAWLING_RESULT-${EnvName}
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  #----------------------------------------------
+  # SEAT
+  #----------------------------------------------
+  SEAT:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+        - AttributeName: isVacant
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: isVacant-sk-index
+          KeySchema:
+            - AttributeName: isVacant
+              KeyType: HASH
+            - AttributeName: sk
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: pk-isVacant-index
+          KeySchema:
+            - AttributeName: pk
+              KeyType: HASH
+            - AttributeName: isVacant
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      TableName: !Sub SEAT-${EnvName}
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  #----------------------------------------------
+  # S3 Bucket
+  #----------------------------------------------
+  S3CrawlingBucket:
+    Type: 'AWS::S3::Bucket'
+    DependsOn: LambdaPersistCrawlingResultTriggerPermission
+    Properties:
+      BucketName: !Sub
+        - ${NameTag}-${EnvName}-crawling
+        - {
+          NameTag: !FindInMap [ StackConfig, NameTag, Value ],
+          EnvName: !Ref EnvName
+        }
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256  
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: txt
+            Function: !GetAtt
+              - LambdaPersistCrawlingResult
+              - Arn
+
+  #----------------------------------------------
+  # lambda
+  #----------------------------------------------
+  LambdaBatchAssignCrawling:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: クロール対象割当処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-BatchAssignCrawling
+      Handler: src/main/application/crawling/BatchAssignCrawling/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+  
+  LambdaCrawlVacantSeat:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 空席クロール処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-CrawlVacantSeat
+      Handler: src/main/application/crawling/CrawlVacantSeat/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 300
+  
+  LambdaPersistCrawlingResult:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 空席クロール結果永続化処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-PersistCrawlingResult
+      Handler: src/main/application/crawling/PersistCrawlingResult/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 8192
+  
+  LambdaPersistCrawlingResultTriggerPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt 
+        - LambdaPersistCrawlingResult
+        - Arn
+      Principal: "s3.amazonaws.com"
+      SourceArn: !Sub arn:aws:s3:::${NameTag}-${EnvName}-crawling
+
+  LambdaPersistVacantSeat:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 空席永続化処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-PersistVacantSeat
+      Handler: src/main/application/seat/PersistVacantSeat/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 8192
+
+  LambdaPersistVacantSeatEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt CRAWLINGRESULT.StreamArn
+      FunctionName: !Ref LambdaPersistVacantSeat
+      StartingPosition: TRIM_HORIZON
+
+  LambdaPersistUnvacantSeat:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 空席永続化処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-PersistUnvacantSeat
+      Handler: src/main/application/seat/PersistUnvacantSeat/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 8192
+
+  LambdaPersistUnvacantSeatEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt CRAWLINGRESULT.StreamArn
+      FunctionName: !Ref LambdaPersistUnvacantSeat
+      StartingPosition: TRIM_HORIZON
+
+  LambdaSeatsVacantPost:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: 空席取得処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+      FunctionName: !Sub ${NameTag}-${EnvName}-SeatsVacantPost
+      Handler: src/main/application/seat/SeatsVacantPost/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs12.x
+      Timeout: 900
+      MemorySize: 8192
+
+  ######################################################
+  # Event Bus
+  ######################################################
+  EventBus:
+    Type: AWS::Events::EventBus
+    Properties: 
+      Name: !Sub ${NameTag}-${EnvName}-event-bus
+
+  BatchAssignCrawlingRule:
+    Type: AWS::Events::Rule
+    Properties: 
+      # EventBusName: !GetAtt
+      #   - EventBus
+      #   - Name
+      Name: !Sub ${NameTag}-${EnvName}-BatchAssignCrawling-rule
+      # RoleArn: String
+      ScheduleExpression: cron(* * * * ? *)
+      State: ENABLED
+      Targets: 
+        - Arn: !GetAtt
+            - LambdaBatchAssignCrawling
+            - Arn
+          Id: !Ref LambdaBatchAssignCrawling
+  
+  LambdaBatchAssignCrawlingEventBusPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaBatchAssignCrawling
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt
+        - BatchAssignCrawlingRule
+        - Arn
+
+  AssignCrawlingRule:
+    Type: AWS::Events::Rule
+    Properties: 
+      EventBusName: !GetAtt
+        - EventBus
+        - Name
+      EventPattern:
+        detail-type: 
+          - AssignCrawling
+      Name: !Sub ${NameTag}-${EnvName}-AssignCrawling-rule
+      State: ENABLED
+      Targets: 
+        - Arn: !GetAtt
+            - LambdaCrawlVacantSeat
+            - Arn
+          Id: !Ref LambdaCrawlVacantSeat
+  
+  LambdaCrawlVacantSeatEventBusPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaCrawlVacantSeat
+      Principal: events.amazonaws.com 
+      
+  ######################################################
+  # Rest API
+  ######################################################
+  RestAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub ${NameTag}-${EnvName}-api
+      EndpointConfiguration:
+        Types:
+          - EDGE
+
+  ######################################################
+  # seats
+  #   - Resource
+  #     - path: /seats
+  ######################################################
+  SeatsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestAPI
+      ParentId: !GetAtt
+        - RestAPI
+        - RootResourceId
+      PathPart: seats
+
+  ######################################################
+  # seats/vacant
+  #   - Resource
+  #     - path: /seats/vacant
+  #   - Method
+  #     - POST
+  #     - OPTION(for enable CORS)
+  #   - Lambda Permission
+  ######################################################
+  SeatsVacantResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref RestAPI
+      ParentId: !Ref SeatsResource
+      PathPart: vacant
+
+  SeatsVacantPostMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: POST
+      ResourceId: !Ref SeatsVacantResource
+      RestApiId: !Ref RestAPI
+      MethodResponses: 
+        - StatusCode: 200
+          ResponseParameters:
+            "method.response.header.Access-Control-Allow-Origin" : true
+        - StatusCode: 400 # Bad Request
+          ResponseParameters:
+            "method.response.header.Access-Control-Allow-Origin" : true
+        - StatusCode: 403 # Forbidden
+          ResponseParameters:
+            "method.response.header.Access-Control-Allow-Origin" : true
+      Integration:
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:ap-northeast-1:lambda:path/2015-03-31/functions/${LambdaSeatsVacantPost.Arn}/invocations
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              'method.response.header.Access-Control-Allow-Origin' : "'*'" # 中身を一重引用符で囲う
+          - StatusCode: 400 # Bad Request
+            ResponseParameters:
+              'method.response.header.Access-Control-Allow-Origin' : "'*'" # 中身を一重引用符で囲う
+          - StatusCode: 403 # Forbidden
+            ResponseParameters:
+              'method.response.header.Access-Control-Allow-Origin' : "'*'" # 中身を一重引用符で囲う
+      AuthorizationType: NONE
+    DependsOn: LambdaSeatsVacantPostPermission
+
+  SeatsVacantOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      RestApiId:
+        Ref: RestAPI
+      ResourceId:
+        Ref: SeatsVacantResource
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+            method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+            method.response.header.Access-Control-Allow-Origin: "'*'"
+          ResponseTemplates:
+            application/json: ''
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        Type: MOCK
+      MethodResponses:
+      - StatusCode: 200
+        ResponseModels:
+          application/json: 'Empty'
+        ResponseParameters:
+          method.response.header.Access-Control-Allow-Headers: false
+          method.response.header.Access-Control-Allow-Methods: false
+          method.response.header.Access-Control-Allow-Origin: false
+    DependsOn: SeatsVacantResource
+
+  LambdaSeatsVacantPostPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaSeatsVacantPost
+      Principal: apigateway.amazonaws.com
