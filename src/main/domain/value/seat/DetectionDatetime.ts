@@ -1,17 +1,17 @@
 
-import moment from "moment";
+import moment from "moment-timezone";
 import { BusinessError } from "../../../common/BusinessError";
 import { PrimitiveValueObject } from "../PrimitiveValueObject";
 
 export class DetectionDatetime extends PrimitiveValueObject<moment.Moment> {
   static create(value: string): DetectionDatetime {
-    const result: string = moment(value, 'YYYY-MM-DD HH:mm:ss').locale('ja').format('YYYY-MM-DD HH:mm:ss')
+    const result: string = moment(value, 'YYYY-MM-DD HH:mm:ss').tz("Asia/Tokyo").locale('ja').format('YYYY-MM-DD HH:mm:ss')
     if (result !== value) throw BusinessError.INVALID_DATE_FORMAT
-    return new DetectionDatetime(moment(value, 'YYYY-MM-DD HH:mm:ss').locale('ja'));
+    return new DetectionDatetime(moment(value, 'YYYY-MM-DD HH:mm:ss').tz("Asia/Tokyo").locale('ja'));
   }
 
   static fromUnixTime(unixTime: number): DetectionDatetime {
-    return process.env.ENV_NAME === 'local' ? new DetectionDatetime(moment.unix(unixTime)) : new DetectionDatetime(moment.unix(unixTime).add('9', 'hour'))
+    return new DetectionDatetime(moment.unix(unixTime).tz("Asia/Tokyo"))
   }
 
   format(): string {
@@ -23,6 +23,6 @@ export class DetectionDatetime extends PrimitiveValueObject<moment.Moment> {
   }
 
   ISO8601(): string {
-    return this.value.toISOString()
+    return this.value.format()
   }
 }
