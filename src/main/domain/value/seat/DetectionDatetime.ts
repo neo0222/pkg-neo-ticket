@@ -11,7 +11,7 @@ export class DetectionDatetime extends PrimitiveValueObject<moment.Moment> {
   }
 
   static fromUnixTime(unixTime: number): DetectionDatetime {
-    return new DetectionDatetime(moment.unix(unixTime).locale('ja'))
+    return new DetectionDatetime(moment.unix(unixTime))
   }
 
   format(): string {

@@ -3,6 +3,7 @@ import * as assert from 'power-assert';
 import * as parser from 'fast-xml-parser'
 import * as fs from 'fs'
 import { VacantSeatInfo } from '../main/domain/value/seat/VacantSeatInfo';
+import { DetectionDatetime } from '../main/domain/value/seat/DetectionDatetime';
 describe('初回', async () => {
   it('test', async () => {
     assert.equal(moment('2021-09-18T09:05:49Z', 'YYYY-MM-DDTHH:mm:ssZ').format('YYYYMMDDHHmmss'), '20210918180549')
@@ -75,5 +76,12 @@ describe('equality of seatInfo', async () => {
         })
       ), false
     )
+  })
+})
+
+describe('検出日時の変換テスト', async () => {
+  it('', async () => {
+    const date: string = DetectionDatetime.fromUnixTime(1632016516).format()
+    assert.equal(date, '2021-09-19 10:55:16')
   })
 })
