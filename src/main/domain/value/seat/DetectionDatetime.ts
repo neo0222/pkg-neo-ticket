@@ -11,7 +11,7 @@ export class DetectionDatetime extends PrimitiveValueObject<moment.Moment> {
   }
 
   static fromUnixTime(unixTime: number): DetectionDatetime {
-    return new DetectionDatetime(moment.unix(unixTime))
+    return process.env.ENV_NAME === 'local' ? new DetectionDatetime(moment.unix(unixTime)) : new DetectionDatetime(moment.unix(unixTime).add('9', 'hour'))
   }
 
   format(): string {
