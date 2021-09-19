@@ -86,6 +86,6 @@ describe('検出日時の変換テスト', async () => {
     const dateAfterPersistence = DetectionDatetime.create(date).format()
     assert.equal(dateAfterPersistence, '2021-09-19 10:55:16')
     const iso8601 = DetectionDatetime.fromUnixTime(1632016516).ISO8601()
-    assert.equal(date, '2021-09-19T10:55:16+09:00')
+    assert.equal(iso8601, '2021-09-19T10:55:16+09:00')
   })
 })

@@ -5,9 +5,9 @@ import { PrimitiveValueObject } from "../PrimitiveValueObject";
 
 export class DetectionDatetime extends PrimitiveValueObject<moment.Moment> {
   static create(value: string): DetectionDatetime {
-    const result: string = moment(value, 'YYYY-MM-DD HH:mm:ss').tz("Asia/Tokyo").locale('ja').format('YYYY-MM-DD HH:mm:ss')
+    const result: string = moment.tz(value, 'YYYY-MM-DD HH:mm:ss', 'Asia/Tokyo').locale('ja').format('YYYY-MM-DD HH:mm:ss')
     if (result !== value) throw BusinessError.INVALID_DATE_FORMAT
-    return new DetectionDatetime(moment(value, 'YYYY-MM-DD HH:mm:ss').tz("Asia/Tokyo").locale('ja'));
+    return new DetectionDatetime(moment.tz(value, 'YYYY-MM-DD HH:mm:ss', 'Asia/Tokyo').locale('ja'));
   }
 
   static fromUnixTime(unixTime: number): DetectionDatetime {
