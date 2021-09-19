@@ -30,7 +30,7 @@ export class PersistUnvacantSeatController implements IController {
     try {
       const promises: Promise<void>[] = []
       for (const record of event.Records) {
-        if (record.eventName !== 'MODIFY') continue // 削除はあり得ない、新規であれば取消対象もない
+        if (record.eventName === 'REMOVE') continue // 削除はあり得ない。新規も本来あり得ないが、過去にRESULTが保存されていなかった場合には必要
         promises.push((async () => {
           if (record.dynamodb?.NewImage?.performanceCode?.S === undefined) throw BusinessError.PERFORMANCE_CODE_NOT_GIVEN
           if (record.dynamodb?.NewImage?.performanceDate?.S === undefined) throw BusinessError.PERFORMANCE_DATE_NOT_GIVEN
