@@ -74,7 +74,7 @@ export class Seat extends EntityBase {
   isAppropriate(): boolean {
     return (this.seatInfo.floor.isEqualOrLessThan(1) && this.seatInfo.row.isEqualOrLessThan(10) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
      || (this.seatInfo.floor.value === '2' && this.seatInfo.row.isEqualOrLessThan(1) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
-     || (this.performanceDate.equals(PerformanceDate.create('20210110')))
+     || (this.performanceDate.equals(PerformanceDate.create('20220110')))
      || (this.seatInfo.floor.value === '2' && this.seatInfo.row.value === '11')
   }
 }
