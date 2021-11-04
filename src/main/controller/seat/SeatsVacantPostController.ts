@@ -33,7 +33,7 @@ export class SeatsVacantPostController implements IController {
   }
 
   convertIdToCode(performanceId: string): PerformanceCode {
-    return PerformanceCode.create('1011')
+    return PerformanceCode.create(performanceId === 'the-phantom-of-the-opera' ? '1011' : '1013')
   }
 
 }

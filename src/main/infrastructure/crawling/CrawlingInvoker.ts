@@ -11,6 +11,7 @@ import { PerformanceDatetimeInfoList } from "../../domain/value/performance/Perf
 import { VacantSeatInfoList } from "../../domain/value/seat/VacantSeatInfoList";
 import { VacantSeatInfo } from "../../domain/value/seat/VacantSeatInfo";
 import * as parser from 'fast-xml-parser'
+import { PerformanceCode } from "../../domain/value/performance/PerformanceCode";
 
 const floorAndRowMapping = {
   '1': [
@@ -57,9 +58,9 @@ export class CrawlingInvoker implements ICrawlingInvoker {
     return { skSession, bigIpKeyValueJoinWithEqual, headersForPost, headersForHtml }
   }
 
-  async getYearAndMonthList(session: Session): Promise<string[]> {
+  async getYearAndMonthList(session: Session, performanceCode: PerformanceCode, koenKi: string): Promise<string[]> {
     await axiosInstance.post(
-      `https://tickets.shiki.jp/ticket/RY101002.do?koenCode=1011&edaban=00&koenKi=6&allJapan=0`,
+      `https://tickets.shiki.jp/ticket/RY101002.do?koenCode=${performanceCode}&edaban=00&koenKi=${koenKi}&allJapan=0`,
       {},
       {
         headers: session.headersForPost,
@@ -87,9 +88,9 @@ export class CrawlingInvoker implements ICrawlingInvoker {
     return yyyyMmSelectPromise.yyyyMmList
   }
 
-  async getAvailabledatetimeList(session: Session, yyyymm: string): Promise<PerformanceDatetimeInfoList> {
+  async getAvailabledatetimeList(session: Session, yyyymm: string, performanceCode: PerformanceCode, koenKi: string): Promise<PerformanceDatetimeInfoList> {
     await axiosInstance.post(
-      `https://tickets.shiki.jp/ticket/RY101002.do?koenCode=1011&edaban=00&koenKi=6&allJapan=0`,
+      `https://tickets.shiki.jp/ticket/RY101002.do?koenCode=${performanceCode}&edaban=00&koenKi=${koenKi}&allJapan=0`,
       {},
       {
         headers: session.headersForPost,

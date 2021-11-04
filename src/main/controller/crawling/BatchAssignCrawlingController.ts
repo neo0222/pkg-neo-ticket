@@ -5,6 +5,7 @@ import { Session } from '../../domain/model/session/Session';
 import { ICrawlingInvoker } from '../../gateway/ICrawlingInvoker';
 import { IEventBridgeInvoker } from '../../gateway/IEventBridgeInvoker';
 import { IController } from "../IController";
+import { PerformanceCode } from '../../domain/value/performance/PerformanceCode';
 
 export class BatchAssignCrawlingController implements IController {
 
@@ -21,19 +22,33 @@ export class BatchAssignCrawlingController implements IController {
 
   async execute(event: EventBridgeLambdaEvent<BatchAssignCrawlingDetail>): Promise<any> {
     try {
-      const session: Session = await this.crawlingInvoker.getSession()
-      const yearAndMonthList: string[] = await this.crawlingInvoker.getYearAndMonthList(session)
-      const promises: Promise<void>[] = []
-      for (const yyyymm of yearAndMonthList) {
-        promises.push(this.eventBridgeInvoker.putEvents(
-          DetailType.AssignCrawling,
-          new BatchAssignCrawlingDetail(
-            '1011', // TODO: 複数公演に対応させる
-            yyyymm
-          )
-        ))
+      const items: {performanceCode: PerformanceCode, koenKi: string}[] = [
+        {
+          performanceCode: PerformanceCode.create('1011'),
+          koenKi: '6',
+        },
+        {
+          performanceCode: PerformanceCode.create('1013'),
+          koenKi: '14',
+        },
+      ]
+      for (const item of items) {
+        const session: Session = await this.crawlingInvoker.getSession()
+        const yearAndMonthList: string[] = await this.crawlingInvoker.getYearAndMonthList(session, item.performanceCode, item.koenKi)
+        const promises: Promise<void>[] = []
+        for (const yyyymm of yearAndMonthList) {
+          promises.push(this.eventBridgeInvoker.putEvents(
+            DetailType.AssignCrawling,
+            new BatchAssignCrawlingDetail(
+              item.performanceCode.toString(), // TODO: 複数公演に対応させる
+              yyyymm,
+              item.koenKi
+            )
+          ))
+        }
+        await Promise.all(promises)
       }
-      await Promise.all(promises)
+      
     } catch (error) {
       console.error(error)
     }
