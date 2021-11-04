@@ -46,9 +46,9 @@ export class PersistCrawlingResultController implements IController {
           const vacantSeatInfoList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(body)
           const [ , performanceCode, performanceDate, matineeOrSoiree, startTimeWithoutColon, fileName ]: [ string, string, string, MatineeOrSoiree, string, string ] = objectKey.split('/') as [ string, string, string, MatineeOrSoiree, string, string ]
           const crawlingResult: CrawlingResult = new CrawlingResult(
-            PerformanceId.create('the-phantom-of-the-opera'), // TODO: 複数演目に対応できるようにする
+            PerformanceId.create(performanceCode === '1011' ? 'the-phantom-of-the-opera' : 'aladdin'), // TODO: 演目マスタをDBにもつようにする
             PerformanceCode.create(performanceCode),
-            PerformanceName.create('オペラ座の怪人'), // TODO: 複数演目に対応できるようにする
+            PerformanceName.create(performanceCode === '1011' ? 'オペラ座の怪人' : 'アラジン'), // TODO: 演目マスタをDBにもつようにする
             PerformanceDate.create(performanceDate),
             matineeOrSoiree,
             PerformanceStartTime.fromHHmm(startTimeWithoutColon),
