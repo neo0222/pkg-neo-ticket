@@ -15,7 +15,8 @@ exports.handler = async (event, context) => {
     case DetailType.AssignCrawling:
       controller = new CrawlVacantSeatController(
         new CrawlingInvoker(),
-        new S3Invoker()
+        new S3Invoker(),
+        new CrawlingResultRepository()
       )
       lambda = new LambdaFunction<EventBridgeLambdaEvent<BatchAssignCrawlingDetail>, any>(controller)
       break
