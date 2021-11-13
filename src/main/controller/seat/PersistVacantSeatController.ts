@@ -50,9 +50,22 @@ export class PersistVacantSeatController implements IController {
             PerformanceDate.create(record.dynamodb.NewImage['performanceDate'].S),
             record.dynamodb.NewImage['matineeOrSoiree'].S as MatineeOrSoiree
           )).orElseThrow(BusinessError.CRAWLER_RESULT_NOT_FOUND)
+          // すでに空席として登録されている全量を取得
+          const alreadyVacantSeatList: Seat[] = (await this.seatRepository.findByCodeAndDateAndMatineeOrSoiree(
+            PerformanceCode.create(record.dynamodb.NewImage['performanceCode'].S),
+            PerformanceDate.create(record.dynamodb.NewImage['performanceDate'].S),
+            record.dynamodb.NewImage['matineeOrSoiree'].S as MatineeOrSoiree
+          )).get()
           const seatPromises: Promise<void>[] = []
           for (const vacantSeatInfo of crawlingResult.vacantSeatInfoList.list) {
             seatPromises.push((async () => {
+              // すでに空席であれば永続化しない
+              if (alreadyVacantSeatList.some(alreadyVacantSeat => {
+                return vacantSeatInfo.equals(alreadyVacantSeat.seatInfo)
+              })) {
+                return
+              }
+              // 以降、満席として登録されていたが今回空席となっていた座席の永続化処理
               const seat: Seat = Seat.create(
                 crawlingResult.performanceId,
                 crawlingResult.performanceCode,
