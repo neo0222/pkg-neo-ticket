@@ -320,7 +320,7 @@ Resources:
       Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
-      MemorySize: 8192
+      MemorySize: 128
 
   LambdaPersistVacantSeatEventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping
@@ -368,7 +368,7 @@ Resources:
       Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
-      MemorySize: 8192
+      MemorySize: 256
 
   ######################################################
   # Event Bus
