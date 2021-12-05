@@ -293,7 +293,7 @@ Resources:
       Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
-      MemorySize: 8192
+      MemorySize: 256
   
   LambdaPersistCrawlingResultTriggerPermission:
     Type: "AWS::Lambda::Permission"
@@ -344,7 +344,7 @@ Resources:
       Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
-      MemorySize: 8192
+      MemorySize: 128
 
   LambdaPersistUnvacantSeatEventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping
@@ -368,7 +368,7 @@ Resources:
       Role: !GetAtt RoleLambda.Arn
       Runtime: nodejs12.x
       Timeout: 900
-      MemorySize: 256
+      MemorySize: 4096
 
   ######################################################
   # Event Bus
