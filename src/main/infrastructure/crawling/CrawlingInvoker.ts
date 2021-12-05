@@ -129,7 +129,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
         const nowYYYYMM = $doc.find('#nowYyyymm')[0].attribs.value
         const availableDatetimeList: PerformanceDatetimeInfo[] = []
         for (let i = 0; i < $doc.find('a').length; i++) {
-          if ($doc.find('a')[i].attribs.class === 'time') {
+          if (!!$doc.find('a')[i].attribs.class && $doc.find('a')[i].attribs.class.includes('time')) {
             const startTime = $doc.find('a')[i].children[0].data.replace('\r\n', '').replace('                                                                    ', '')
             const morOrAft = $doc.find('a')[i].parent.attribs.class
             let dayNumber
