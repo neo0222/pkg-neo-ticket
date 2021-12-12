@@ -24,4 +24,8 @@ export class PerformanceDate extends PrimitiveValueObject<moment.Moment> {
   equals(target: PerformanceDate): boolean {
     return this._value.isSame(target._value)
   }
+
+  isSameOrAfter(target: PerformanceDate): boolean {
+    return this._value.isSameOrAfter(target.value)
+  }
 }

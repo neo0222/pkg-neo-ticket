@@ -27,10 +27,10 @@ export class BatchAssignCrawlingController implements IController {
           performanceCode: PerformanceCode.create('1011'),
           koenKi: '6',
         },
-        {
-          performanceCode: PerformanceCode.create('1013'),
-          koenKi: '14',
-        },
+        // {
+        //   performanceCode: PerformanceCode.create('1013'),
+        //   koenKi: '14',
+        // },
       ]
       for (const item of items) {
         const session: Session = await this.crawlingInvoker.getSession()
