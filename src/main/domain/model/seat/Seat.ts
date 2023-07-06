@@ -75,6 +75,9 @@ export class Seat extends EntityBase {
     if (this.performanceCode.value === '2007') {
       return this.seatInfo.row.isEqualOrLessThan(9) && this.seatInfo.column.isEqualOrGreaterThan(39) && this.seatInfo.column.isEqualOrLessThan(57)
     }
+    if (this.performanceCode.value === '3017') {
+      return this.seatInfo.row.isEqualOrLessThan(9) && this.seatInfo.column.isEqualOrGreaterThan(39) && this.seatInfo.column.isEqualOrLessThan(57)
+    }
     // return (this.seatInfo.floor.isEqualOrLessThan(1) && this.seatInfo.row.isEqualOrLessThan(10) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
     //  || (this.seatInfo.floor.value === '2' && this.seatInfo.row.isEqualOrLessThan(1) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
     return (this.seatInfo.floor.value === '2' && this.seatInfo.row.isEqualOrLessThan(1) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
