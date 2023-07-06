@@ -257,7 +257,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       const [ , floor, row, column, ] = seat.attr['@_id'].split('-')
       if (performanceCode.equals(PerformanceCode.create('2007'))) {// アンフィシアターはやばい
         seatList.push(VacantSeatInfo.create({
-          floor,
+          floor: performanceCodeAndFloorMapping[`${performanceCode}`][`${floor}-${row}-${column}`].floor,
           row: performanceCodeAndFloorMapping[`${performanceCode}`][`${floor}-${row}-${column}`].row,
           column: performanceCodeAndFloorMapping[`${performanceCode}`][`${floor}-${row}-${column}`].column,
         }))
