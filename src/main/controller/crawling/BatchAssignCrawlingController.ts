@@ -49,6 +49,12 @@ export class BatchAssignCrawlingController implements IController {
           // 美女と野獣
           // dayClick('ry101001Form','2007','00',2,'0');
         },
+        {
+          performanceCode: PerformanceCode.create('3017'),
+          koenKi: '3',
+          // 美女と野獣
+          // dayClick('ry101001Form','3017','00',3,'0');
+        },
       ]
       for (const item of items) {
         const session: Session = await this.crawlingInvoker.getSession()

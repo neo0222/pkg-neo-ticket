@@ -61,6 +61,10 @@ export class CrawlVacantSeatController implements IController {
           performanceId: 'beauty-and-the-beast',
           performanceName: '美女と野獣',
         },
+        '3017': {
+          performanceId: 'beauty-and-the-beast-2',
+          performanceName: '美女と野獣',
+        },
       }
       const promises: Promise<void>[] = []
       for (const [availableDatetime, rawCrawlingResult] of performanceDatetimeInfoAndRawCrawlingResultMap.entries()) {
