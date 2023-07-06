@@ -252,7 +252,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
     const jsonObj = parser.convertToJson(tObj,options)
     const seatList: VacantSeatInfo[] = []
     jsonObj.svg.g[1].g.filter(seat => {
-      return ['color01', 'color02'].includes(seat.circle.attr['@_class'])
+      return ['color01', 'color02', 'color03', 'color04', 'color05', 'color06', 'color07'].includes(seat.circle.attr['@_class'])
     }).forEach(seat => {
       const [ , floor, row, column, ] = seat.attr['@_id'].split('-')
       if (performanceCode.equals(PerformanceCode.create('2007'))) {// アンフィシアターはやばい
