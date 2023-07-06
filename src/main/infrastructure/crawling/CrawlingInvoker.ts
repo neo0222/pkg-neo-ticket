@@ -13,6 +13,7 @@ import { VacantSeatInfo } from "../../domain/value/seat/VacantSeatInfo";
 import * as parser from 'fast-xml-parser'
 import { PerformanceCode } from "../../domain/value/performance/PerformanceCode";
 import { amphiFloorMapping } from "./amphiFloorMapping"
+import { jiyuFloorMapping } from "./jiyuFloorMapping";
 
 const akiFloorMapping = {
   floorAndRowMapping: {
@@ -51,7 +52,8 @@ const performanceCodeAndFloorMapping = {
   '3015': haruFloorMapping,
   '3009': akiFloorMapping,
   '2007': amphiFloorMapping,
-  '3017': haruFloorMapping,
+  '3017': amphiFloorMapping,
+  '3012': jiyuFloorMapping,
 }
 
 const axiosInstance = axios.create({ timeout: 20000 })
@@ -256,7 +258,10 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       return ['color01', 'color02', 'color03', 'color04', 'color05', 'color06', 'color07'].includes(seat.circle.attr['@_class'])
     }).forEach(seat => {
       const [ , floor, row, column, ] = seat.attr['@_id'].split('-')
-      if (performanceCode.equals(PerformanceCode.create('2007'))) {// アンフィシアターはやばい
+      if (performanceCode.equals(PerformanceCode.create('2007'))
+        || performanceCode.equals(PerformanceCode.create('3017'))
+        || performanceCode.equals(PerformanceCode.create('3012'))
+      ) {// アンフィシアターと自由劇場
         seatList.push(VacantSeatInfo.create({
           floor: performanceCodeAndFloorMapping[`${performanceCode}`][`${floor}-${row}-${column}`].floor,
           row: performanceCodeAndFloorMapping[`${performanceCode}`][`${floor}-${row}-${column}`].row,
