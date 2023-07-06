@@ -48,14 +48,24 @@ export class CrawlVacantSeatController implements IController {
           vacantSeatSvg
         )
       }
+      const performanceCodeMap = {
+        '3015': {
+          performanceId: 'frozen',
+          performanceName: 'アナと雪の女王',
+        },
+        '3009': {
+          performanceId: 'the-hunchback-of-notre-dame',
+          performanceName: 'ノートルダムの鐘',
+        },
+      }
       const promises: Promise<void>[] = []
       for (const [availableDatetime, rawCrawlingResult] of performanceDatetimeInfoAndRawCrawlingResultMap.entries()) {
         promises.push((async () => {
-          const vacantSeatInfoList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(rawCrawlingResult)
+          const vacantSeatInfoList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(rawCrawlingResult, PerformanceCode.create(performanceCode))
           const crawlingResult: CrawlingResult = new CrawlingResult(
-            PerformanceId.create(performanceCode === '1011' ? 'the-phantom-of-the-opera' : 'aladdin'), // TODO: 演目マスタをDBにもつようにする
+            PerformanceId.create(performanceCodeMap[performanceCode].performanceId), // TODO: 演目マスタをDBにもつようにする
             PerformanceCode.create(performanceCode),
-            PerformanceName.create(performanceCode === '1011' ? 'オペラ座の怪人' : 'アラジン'), // TODO: 演目マスタをDBにもつようにする
+            PerformanceName.create(performanceCodeMap[performanceCode].performanceName), // TODO: 演目マスタをDBにもつようにする
             availableDatetime.day,
             availableDatetime.matineeOrSoiree,
             availableDatetime.startTime,

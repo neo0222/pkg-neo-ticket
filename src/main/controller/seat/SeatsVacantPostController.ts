@@ -33,7 +33,11 @@ export class SeatsVacantPostController implements IController {
   }
 
   convertIdToCode(performanceId: string): PerformanceCode {
-    return PerformanceCode.create(performanceId === 'the-phantom-of-the-opera' ? '1011' : '1013')
+    const performanceIdCodeMap = {
+      'frozen': '3015',
+      'the-hunchback-of-notre-dame': '3009',
+    }
+    return PerformanceCode.create(performanceIdCodeMap[performanceId])
   }
 
 }

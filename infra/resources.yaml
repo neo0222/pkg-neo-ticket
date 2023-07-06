@@ -258,7 +258,7 @@ Resources:
       FunctionName: !Sub ${NameTag}-${EnvName}-BatchAssignCrawling
       Handler: src/main/application/crawling/BatchAssignCrawling/index.handler
       Role: !GetAtt RoleLambda.Arn
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 900
   
   LambdaCrawlVacantSeat:
@@ -274,7 +274,7 @@ Resources:
       FunctionName: !Sub ${NameTag}-${EnvName}-CrawlVacantSeat
       Handler: src/main/application/crawling/CrawlVacantSeat/index.handler
       Role: !GetAtt RoleLambda.Arn
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 900
       MemorySize: 300
   
@@ -291,7 +291,7 @@ Resources:
       FunctionName: !Sub ${NameTag}-${EnvName}-PersistCrawlingResult
       Handler: src/main/application/crawling/PersistCrawlingResult/index.handler
       Role: !GetAtt RoleLambda.Arn
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 900
       MemorySize: 256
   
@@ -318,7 +318,7 @@ Resources:
       FunctionName: !Sub ${NameTag}-${EnvName}-PersistVacantSeat
       Handler: src/main/application/seat/PersistVacantSeat/index.handler
       Role: !GetAtt RoleLambda.Arn
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 900
       MemorySize: 128
 
@@ -342,7 +342,7 @@ Resources:
       FunctionName: !Sub ${NameTag}-${EnvName}-PersistUnvacantSeat
       Handler: src/main/application/seat/PersistUnvacantSeat/index.handler
       Role: !GetAtt RoleLambda.Arn
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 900
       MemorySize: 128
 
@@ -366,7 +366,7 @@ Resources:
       FunctionName: !Sub ${NameTag}-${EnvName}-SeatsVacantPost
       Handler: src/main/application/seat/SeatsVacantPost/index.handler
       Role: !GetAtt RoleLambda.Arn
-      Runtime: nodejs12.x
+      Runtime: nodejs16.x
       Timeout: 900
       MemorySize: 4096
 

@@ -13,21 +13,43 @@ import { VacantSeatInfo } from "../../domain/value/seat/VacantSeatInfo";
 import * as parser from 'fast-xml-parser'
 import { PerformanceCode } from "../../domain/value/performance/PerformanceCode";
 
-const floorAndRowMapping = {
-  '1': [
-    '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22',
-  ],
-  '2': [
-    '1','2','3','4','5','6',' ',
-    '7','8','9','10','11'
+const akiFloorMapping = {
+  floorAndRowMapping: {
+    '1': [
+      '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22',
+    ],
+    '2': [
+      '1','2','3','4','5','6',' ',
+      '7','8','9','10','11'
+    ]
+  },
+  columnMapping: [
+    '1','2','3','4','5','6','7','8','9','10','11','12','13',' ',
+    '14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29',' ',
+    '30','31','32','33','34','35','36','37','38','39','40','41','42',
   ]
-} // TODO: 劇場によって変わる
+}
+const haruFloorMapping = {
+  floorAndRowMapping: {
+    '1': [
+      '1','2','3','4','5','6','7','8','9','10','11','12','13', '','14','15','16','17','18','19','20','21','22','23','24','25','26',
+    ],
+    '2': [
+      '1','2', '3', '4', '5', '6', '7', '',
+      '8','9','10','11','12','13','14','15'
+    ]
+  },
+  columnMapping: [
+    '1','2','3','4','5','6','7','8','9','10','11','12','13',' ',
+    '14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29',' ',
+    '30','31','32','33','34','35','36','37','38','39','40','41','42',
+  ]
+}
 
-const columnMapping = [
-  '1','2','3','4','5','6','7','8','9','10','11','12','13',' ',
-  '14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29',' ',
-  '30','31','32','33','34','35','36','37','38','39','40','41','42',
-] // TODO: 劇場によって変わる
+const performanceCodeAndFloorMapping = {
+  '3015': haruFloorMapping,
+  '3009': akiFloorMapping,
+}
 
 const axiosInstance = axios.create({ timeout: 20000 })
 
@@ -206,7 +228,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
     return getSvgRes.data
   }
 
-  async getAvailableSeatList(svgData: string): Promise<VacantSeatInfoList> {
+  async getAvailableSeatList(svgData: string, performanceCode: PerformanceCode): Promise<VacantSeatInfoList> {
     const options: parser.X2jOptionsOptional = {
       attributeNamePrefix : "@_",
       attrNodeName: "attr", //default is 'false'
@@ -233,8 +255,8 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       const [ , floor, row, column, ] = seat.attr['@_id'].split('-')
       seatList.push(VacantSeatInfo.create({
         floor,
-        row: floorAndRowMapping[floor][row],
-        column: columnMapping[column],
+        row: performanceCodeAndFloorMapping[`${performanceCode}`].floorAndRowMapping[floor][row],
+        column: performanceCodeAndFloorMapping[`${performanceCode}`].columnMapping[column],
       }))
     });
     console.log(`[SUCCESS]collected available seat. count: ${seatList.length}`)
