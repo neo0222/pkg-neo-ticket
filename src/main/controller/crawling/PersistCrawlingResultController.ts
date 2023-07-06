@@ -36,6 +36,12 @@ export class PersistCrawlingResultController implements IController {
   }
 
   async execute(event: S3Event): Promise<any> {
+    const performanceCodeMap = {
+      '3015': {
+        performanceId: 'frozen',
+        performanceName: 'アナと雪の女王',
+      },
+    }
     try {
       const promises: Promise<void>[] = []
       for (const record of event.Records) {
@@ -43,12 +49,12 @@ export class PersistCrawlingResultController implements IController {
           const objectKey: string = record.s3.object.key
           const body: Nullable<string> = await this.s3Invoker.getObject(objectKey)
           if (!body) throw SystemError.S3_ACCESS_FAILED
-          const vacantSeatInfoList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(body)
           const [ , performanceCode, performanceDate, matineeOrSoiree, startTimeWithoutColon, fileName ]: [ string, string, string, MatineeOrSoiree, string, string ] = objectKey.split('/') as [ string, string, string, MatineeOrSoiree, string, string ]
+          const vacantSeatInfoList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(body, PerformanceCode.create(performanceCode))
           const crawlingResult: CrawlingResult = new CrawlingResult(
-            PerformanceId.create(performanceCode === '1011' ? 'the-phantom-of-the-opera' : 'aladdin'), // TODO: 演目マスタをDBにもつようにする
+            PerformanceId.create(performanceCodeMap[performanceCode].performanceId), // TODO: 演目マスタをDBにもつようにする
             PerformanceCode.create(performanceCode),
-            PerformanceName.create(performanceCode === '1011' ? 'オペラ座の怪人' : 'アラジン'), // TODO: 演目マスタをDBにもつようにする
+            PerformanceName.create(performanceCodeMap[performanceCode].performanceName), // TODO: 演目マスタをDBにもつようにする
             PerformanceDate.create(performanceDate),
             matineeOrSoiree,
             PerformanceStartTime.fromHHmm(startTimeWithoutColon),

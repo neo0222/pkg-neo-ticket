@@ -23,14 +23,20 @@ export class BatchAssignCrawlingController implements IController {
   async execute(event: EventBridgeLambdaEvent<BatchAssignCrawlingDetail>): Promise<any> {
     try {
       const items: {performanceCode: PerformanceCode, koenKi: string}[] = [
-        {
-          performanceCode: PerformanceCode.create('1011'),
-          koenKi: '6',
-        },
+        // {
+        //   performanceCode: PerformanceCode.create('1011'),
+        //   koenKi: '6',
+        // },
         // {
         //   performanceCode: PerformanceCode.create('1013'),
         //   koenKi: '14',
         // },
+        {
+          performanceCode: PerformanceCode.create('3015'),
+          koenKi: '5',
+          // アナ雪 2023/7-2023/12
+          // onclick="dayClick('ry101001Form','3015','00',5,'0');"
+        }
       ]
       for (const item of items) {
         const session: Session = await this.crawlingInvoker.getSession()
