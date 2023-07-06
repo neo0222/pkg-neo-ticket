@@ -42,7 +42,13 @@ export class BatchAssignCrawlingController implements IController {
           koenKi: '1',
           // ノートルダム
           // dayClick('ry101001Form','3009','00',1,'0');
-        }
+        },
+        {
+          performanceCode: PerformanceCode.create('2007'),
+          koenKi: '2',
+          // 美女と野獣
+          // dayClick('ry101001Form','2007','00',2,'0');
+        },
       ]
       for (const item of items) {
         const session: Session = await this.crawlingInvoker.getSession()

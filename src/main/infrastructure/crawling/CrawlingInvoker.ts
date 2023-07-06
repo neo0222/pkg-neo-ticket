@@ -12,6 +12,7 @@ import { VacantSeatInfoList } from "../../domain/value/seat/VacantSeatInfoList";
 import { VacantSeatInfo } from "../../domain/value/seat/VacantSeatInfo";
 import * as parser from 'fast-xml-parser'
 import { PerformanceCode } from "../../domain/value/performance/PerformanceCode";
+import { amphiFloorMapping } from "./amphiFloorMapping"
 
 const akiFloorMapping = {
   floorAndRowMapping: {
@@ -49,6 +50,7 @@ const haruFloorMapping = {
 const performanceCodeAndFloorMapping = {
   '3015': haruFloorMapping,
   '3009': akiFloorMapping,
+  '2007': amphiFloorMapping,
 }
 
 const axiosInstance = axios.create({ timeout: 20000 })
@@ -253,11 +255,19 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       return ['color01', 'color02'].includes(seat.circle.attr['@_class'])
     }).forEach(seat => {
       const [ , floor, row, column, ] = seat.attr['@_id'].split('-')
-      seatList.push(VacantSeatInfo.create({
-        floor,
-        row: performanceCodeAndFloorMapping[`${performanceCode}`].floorAndRowMapping[floor][row],
-        column: performanceCodeAndFloorMapping[`${performanceCode}`].columnMapping[column],
-      }))
+      if (performanceCode.equals(PerformanceCode.create('2007'))) {// アンフィシアターはやばい
+        seatList.push(VacantSeatInfo.create({
+          floor,
+          row: performanceCodeAndFloorMapping[`${performanceCode}`][`${floor}-${row}-${column}`].row,
+          column: performanceCodeAndFloorMapping[`${performanceCode}`][`${floor}-${row}-${column}`].column,
+        }))
+      } else {
+        seatList.push(VacantSeatInfo.create({
+          floor,
+          row: performanceCodeAndFloorMapping[`${performanceCode}`].floorAndRowMapping[floor][row],
+          column: performanceCodeAndFloorMapping[`${performanceCode}`].columnMapping[column],
+        }))
+      }
     });
     console.log(`[SUCCESS]collected available seat. count: ${seatList.length}`)
 

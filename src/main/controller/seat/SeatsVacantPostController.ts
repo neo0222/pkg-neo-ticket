@@ -36,6 +36,7 @@ export class SeatsVacantPostController implements IController {
     const performanceIdCodeMap = {
       'frozen': '3015',
       'the-hunchback-of-notre-dame': '3009',
+      'beauty-and-the-beast': '2007',
     }
     return PerformanceCode.create(performanceIdCodeMap[performanceId])
   }
