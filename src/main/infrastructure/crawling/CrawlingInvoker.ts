@@ -47,8 +47,8 @@ const haruFloorMapping = {
 }
 
 const performanceCodeAndFloorMapping = {
-  '1011': akiFloorMapping,
   '3015': haruFloorMapping,
+  '3009': akiFloorMapping,
 }
 
 const axiosInstance = axios.create({ timeout: 20000 })

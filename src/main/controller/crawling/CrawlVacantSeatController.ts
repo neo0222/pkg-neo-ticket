@@ -53,6 +53,10 @@ export class CrawlVacantSeatController implements IController {
           performanceId: 'frozen',
           performanceName: 'アナと雪の女王',
         },
+        '3009': {
+          performanceId: 'the-hunchback-of-notre-dame',
+          performanceName: 'ノートルダムの鐘',
+        },
       }
       const promises: Promise<void>[] = []
       for (const [availableDatetime, rawCrawlingResult] of performanceDatetimeInfoAndRawCrawlingResultMap.entries()) {

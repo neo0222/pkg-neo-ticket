@@ -35,6 +35,7 @@ export class SeatsVacantPostController implements IController {
   convertIdToCode(performanceId: string): PerformanceCode {
     const performanceIdCodeMap = {
       'frozen': '3015',
+      'the-hunchback-of-notre-dame': '3009',
     }
     return PerformanceCode.create(performanceIdCodeMap[performanceId])
   }

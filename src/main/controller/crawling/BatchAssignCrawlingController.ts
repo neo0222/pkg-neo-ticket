@@ -36,6 +36,12 @@ export class BatchAssignCrawlingController implements IController {
           koenKi: '5',
           // アナ雪 2023/7-2023/12
           // onclick="dayClick('ry101001Form','3015','00',5,'0');"
+        },
+        {
+          performanceCode: PerformanceCode.create('3009'),
+          koenKi: '1',
+          // ノートルダム
+          // dayClick('ry101001Form','3009','00',1,'0');
         }
       ]
       for (const item of items) {

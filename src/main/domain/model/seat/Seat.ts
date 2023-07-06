@@ -77,5 +77,6 @@ export class Seat extends EntityBase {
     return (this.seatInfo.floor.value === '2' && this.seatInfo.row.isEqualOrLessThan(1) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
      || (this.seatInfo.floor.value === '1' && this.seatInfo.row.isEqualOrLessThan(10) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
      || (this.seatInfo.floor.value === '2' && this.seatInfo.row.value === '11')
+     || (this.performanceCode.value === '3009')
   }
 }
