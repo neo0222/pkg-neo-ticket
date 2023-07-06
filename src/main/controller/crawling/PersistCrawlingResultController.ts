@@ -45,6 +45,14 @@ export class PersistCrawlingResultController implements IController {
         performanceId: 'the-hunchback-of-notre-dame',
         performanceName: 'ノートルダムの鐘',
       },
+      '2007': {
+        performanceId: 'beauty-and-the-beast',
+        performanceName: '美女と野獣',
+      },
+      '3017': {
+        performanceId: 'beauty-and-the-beast-2',
+        performanceName: '美女と野獣',
+      },
     }
     try {
       const promises: Promise<void>[] = []

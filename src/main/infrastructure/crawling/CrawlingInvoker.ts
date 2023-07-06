@@ -12,6 +12,8 @@ import { VacantSeatInfoList } from "../../domain/value/seat/VacantSeatInfoList";
 import { VacantSeatInfo } from "../../domain/value/seat/VacantSeatInfo";
 import * as parser from 'fast-xml-parser'
 import { PerformanceCode } from "../../domain/value/performance/PerformanceCode";
+import { amphiFloorMapping } from "./amphiFloorMapping"
+import { jiyuFloorMapping } from "./jiyuFloorMapping";
 
 const akiFloorMapping = {
   floorAndRowMapping: {
@@ -49,6 +51,9 @@ const haruFloorMapping = {
 const performanceCodeAndFloorMapping = {
   '3015': haruFloorMapping,
   '3009': akiFloorMapping,
+  '2007': amphiFloorMapping,
+  '3017': amphiFloorMapping,
+  '3012': jiyuFloorMapping,
 }
 
 const axiosInstance = axios.create({ timeout: 20000 })
@@ -250,14 +255,25 @@ export class CrawlingInvoker implements ICrawlingInvoker {
     const jsonObj = parser.convertToJson(tObj,options)
     const seatList: VacantSeatInfo[] = []
     jsonObj.svg.g[1].g.filter(seat => {
-      return ['color01', 'color02'].includes(seat.circle.attr['@_class'])
+      return ['color01', 'color02', 'color03', 'color04', 'color05', 'color06', 'color07'].includes(seat.circle.attr['@_class'])
     }).forEach(seat => {
       const [ , floor, row, column, ] = seat.attr['@_id'].split('-')
-      seatList.push(VacantSeatInfo.create({
-        floor,
-        row: performanceCodeAndFloorMapping[`${performanceCode}`].floorAndRowMapping[floor][row],
-        column: performanceCodeAndFloorMapping[`${performanceCode}`].columnMapping[column],
-      }))
+      if (performanceCode.equals(PerformanceCode.create('2007'))
+        || performanceCode.equals(PerformanceCode.create('3017'))
+        || performanceCode.equals(PerformanceCode.create('3012'))
+      ) {// アンフィシアターと自由劇場
+        seatList.push(VacantSeatInfo.create({
+          floor: performanceCodeAndFloorMapping[`${performanceCode}`][`${floor}-${row}-${column}`].floor,
+          row: performanceCodeAndFloorMapping[`${performanceCode}`][`${floor}-${row}-${column}`].row,
+          column: performanceCodeAndFloorMapping[`${performanceCode}`][`${floor}-${row}-${column}`].column,
+        }))
+      } else {
+        seatList.push(VacantSeatInfo.create({
+          floor,
+          row: performanceCodeAndFloorMapping[`${performanceCode}`].floorAndRowMapping[floor][row],
+          column: performanceCodeAndFloorMapping[`${performanceCode}`].columnMapping[column],
+        }))
+      }
     });
     console.log(`[SUCCESS]collected available seat. count: ${seatList.length}`)
 
