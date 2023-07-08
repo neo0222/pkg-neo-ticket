@@ -115,7 +115,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
     return yyyyMmSelectPromise.yyyyMmList
   }
   
-  async leadSessionForDateSelection(session: Session, yyyymm: string, performanceCode: PerformanceCode, koenki: string): Promise<any> {
+  async leadSessionForDateSelection(session: Session, yyyymm: string, performanceCode: PerformanceCode, koenKi: string): Promise<any> {
     await axiosInstance.post(
       `https://tickets.shiki.jp/ticket/RY101002.do?koenCode=${performanceCode}&edaban=00&koenKi=${koenKi}&allJapan=0`,
       {},
