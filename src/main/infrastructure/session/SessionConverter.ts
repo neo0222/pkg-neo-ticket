@@ -29,9 +29,9 @@ export const SessionConverter = class SessionConverter implements IDtoConverter<
       entity.headersForPost,
       entity.headersForHtml,
       entity.isReady,
-      entity.sessionGoal.performanceCode.value,
-      entity.sessionGoal.koenki,
-      entity.sessionGoal.yyyymm,
+      entity.sessionGoal?.performanceCode.value!,
+      entity.sessionGoal?.koenki!,
+      entity.sessionGoal?.yyyymm!,
     )
   }
 }
