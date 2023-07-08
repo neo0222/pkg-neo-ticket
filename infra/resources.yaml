@@ -102,6 +102,19 @@ Resources:
             Resource:
               - "*"
 
+  SnsPublishPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize to publish sns topic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - sns:Publish
+            Resource:
+              - "*"
+
   S3Policy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -136,6 +149,7 @@ Resources:
         - !Ref DynamoDBStreamReadPolicy
         - !Ref PutEventPolicy
         - !Ref S3Policy
+        - !Ref SnsPublishPolicy
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -307,6 +321,7 @@ Resources:
 
   LambdaPersistVacantSeat:
     Type: AWS::Lambda::Function
+    DependsOn: SNSVacantSeatNotificationTopic
     Properties:
       Description: 空席永続化処理
       Code:
@@ -315,6 +330,7 @@ Resources:
       Environment:
         Variables:
           ENV_NAME: !Ref EnvName
+          NOTIFICATION_TOPIC_ARN: !GetAtt SNSVacantSeatNotificationTopic.TopicArn
       FunctionName: !Sub ${NameTag}-${EnvName}-PersistVacantSeat
       Handler: src/main/application/seat/PersistVacantSeat/index.handler
       Role: !GetAtt RoleLambda.Arn
@@ -540,3 +556,8 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref LambdaSeatsVacantPost
       Principal: apigateway.amazonaws.com
+
+  SNSVacantSeatNotificationTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      TopicName: !Sub ${NameTag}-${EnvName}-VacantSeatNotificationTopic

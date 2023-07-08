@@ -3,6 +3,7 @@ export const SystemError = {
   OPTIMISTIC_LOCK_FAILED: 'error.optimistic.lock.failed',
   EVENT_BRIDGE_ACCESS_FAILED: 'error.event.bridge.access.failed',
   S3_ACCESS_FAILED: 'error.s3.access.failed',
+  SNS_ACCESS_FAILED: 'error.sns.access.failed',
   COGNITO_ACCESS_FAILED: 'error.cognito.access.failed',
   SSM_ACCESS_FAILED: 'error.ssm.access.failed',
   NOTIFICATION_FROM_ADDRESS_NOT_FOUND: 'error.notification.from.address.not.found',

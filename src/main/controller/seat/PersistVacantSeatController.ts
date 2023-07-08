@@ -19,19 +19,23 @@ import { DetectionDatetime } from "../../domain/value/seat/DetectionDatetime"
 import { VacantSeatInfoList } from "../../domain/value/seat/VacantSeatInfoList"
 import { ICrawlingInvoker } from "../../gateway/ICrawlingInvoker"
 import { IS3Invoker } from "../../gateway/IS3Invoker"
+import { ISnsInvoker } from "../../gateway/ISnsInvoker"
 import { IController } from "../IController"
 
 export class PersistVacantSeatController implements IController {
 
   crawlingResultRepository: ICrawlingResultRepository
   seatRepository: ISeatRepository
+  snsInvoker: ISnsInvoker
 
   constructor(
     crawlingResultRepository: ICrawlingResultRepository,
-    seatRepository: ISeatRepository
+    seatRepository: ISeatRepository,
+    snsInvoker: ISnsInvoker,
   ) {
     this.crawlingResultRepository = crawlingResultRepository
     this.seatRepository = seatRepository
+    this.snsInvoker = snsInvoker
   }
 
   async execute(event: DynamoDBStreamEvent): Promise<any> {
@@ -77,6 +81,8 @@ export class PersistVacantSeatController implements IController {
                 DetectionDatetime.fromUnixTime(unixTime)
               )
               await this.seatRepository.save(seat)
+              // 通知
+              await this.snsInvoker.publish(seat.notificationSubject, seat.notificationMessage)
             })())
           }
           await Promise.all(seatPromises)

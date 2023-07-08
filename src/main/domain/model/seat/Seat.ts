@@ -87,4 +87,19 @@ export class Seat extends EntityBase {
     //  || (this.seatInfo.floor.value === '2' && this.seatInfo.row.isEqualOrLessThan(1) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
     return this.performanceCode.value === '3009'
   }
+
+  get notificationSubject() {
+    return `[空席通知]${this.performanceName} ${this.performanceDate.formatJp} ${this.performanceStartTime.formatJp}開演 ${this.seatInfo.format}`
+  }
+
+  get notificationMessage() {
+    return `掲題の通り、以下のチケットが取得可能になりました。以下リンクから購入できます。
+https://entrance.shiki.jp/ticket/top.do
+
+【チケット情報】
+公演名：${this.performanceName}
+公演日：${this.performanceDate.formatJp()}
+開演時刻：${this.performanceStartTime.formatJp()}開演
+座席：${this.seatInfo.format}`
+  }
 }
