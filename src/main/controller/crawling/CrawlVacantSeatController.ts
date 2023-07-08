@@ -42,8 +42,9 @@ export class CrawlVacantSeatController implements IController {
         koenKi)
       const performanceDatetimeInfoAndRawCrawlingResultMap: Map<PerformanceDatetimeInfo, string> = new Map<PerformanceDatetimeInfo, string>()
       const processAvailableDatetimeList = async (availableDatetimeList: PerformanceDatetimeInfoList) => {
+        const newSession: Session = await this.crawlingInvoker.getSession()
+        console.log(`start crawling process. perfomanceCode: ${performanceCode}, yyyymm: ${yyyymm}, target list: ${availableDatetimeList}`)
         for (const availableDatetime of availableDatetimeList.list) {
-          const newSession: Session = await this.crawlingInvoker.getSession()
           const vacantSeatSvg: string = await this.crawlingInvoker.getAvailableSeatSvg(newSession, yyyymm, availableDatetime)
           performanceDatetimeInfoAndRawCrawlingResultMap.set(
             availableDatetime,

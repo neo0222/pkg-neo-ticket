@@ -41,4 +41,13 @@ export class PerformanceDatetimeInfoList extends ValueObject<PerformanceDatetime
     return this.list.length === 0
   }
 
+  toString(): string {
+    return JSON.stringify(this.list.map(info => {
+      return {
+        day: info.day.formatJp(),
+        startTime: info.startTime.formatJp()
+      }
+    }))
+  }
+
 }
