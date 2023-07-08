@@ -78,11 +78,13 @@ export class Seat extends EntityBase {
     if (this.performanceCode.value === '3017') {
       return this.seatInfo.row.isEqualOrLessThan(9) && this.seatInfo.column.isEqualOrGreaterThan(39) && this.seatInfo.column.isEqualOrLessThan(57)
     }
+    if (this.performanceId.value === 'frozen') {
+      return (this.seatInfo.floor.value === '2' && this.seatInfo.row.isEqualOrLessThan(1) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
+      || (this.seatInfo.floor.value === '1' && this.seatInfo.row.isEqualOrLessThan(10) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
+      || (this.seatInfo.floor.value === '2' && this.seatInfo.row.isEqualOrGreaterThan(14))
+    }
     // return (this.seatInfo.floor.isEqualOrLessThan(1) && this.seatInfo.row.isEqualOrLessThan(10) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
     //  || (this.seatInfo.floor.value === '2' && this.seatInfo.row.isEqualOrLessThan(1) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
-    return (this.seatInfo.floor.value === '2' && this.seatInfo.row.isEqualOrLessThan(1) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
-     || (this.seatInfo.floor.value === '1' && this.seatInfo.row.isEqualOrLessThan(10) && this.seatInfo.column.isEqualOrGreaterThan(15) && this.seatInfo.column.isEqualOrLessThan(28))
-     || (this.seatInfo.floor.value === '2' && this.seatInfo.row.value === '11')
-     || (this.performanceCode.value === '3009')
+    return this.performanceCode.value === '3009'
   }
 }

@@ -13,4 +13,8 @@ export class SeatRow extends PrimitiveValueObject<string> {
   isEqualOrLessThan(num: number): boolean {
     return Number(this.value) <= num
   }
+
+  isEqualOrGreaterThan(num: number): boolean {
+    return Number(this.value) >= num
+  }
 }
