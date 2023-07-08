@@ -43,6 +43,12 @@ export class CrawlVacantSeatController implements IController {
       const performanceDatetimeInfoAndRawCrawlingResultMap: Map<PerformanceDatetimeInfo, string> = new Map<PerformanceDatetimeInfo, string>()
       const processAvailableDatetimeList = async (availableDatetimeList: PerformanceDatetimeInfoList) => {
         const newSession: Session = await this.crawlingInvoker.getSession()
+        await this.crawlingInvoker.leadSessionForDateSelection(
+          newSession,
+          yyyymm,
+          PerformanceCode.create(performanceCode),
+          koenKi,
+        )
         console.log(`start crawling process. perfomanceCode: ${performanceCode}, yyyymm: ${yyyymm}, target list: ${availableDatetimeList}`)
         for (const availableDatetime of availableDatetimeList.list) {
           const vacantSeatSvg: string = await this.crawlingInvoker.getAvailableSeatSvg(newSession, yyyymm, availableDatetime)
