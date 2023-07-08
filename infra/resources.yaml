@@ -102,6 +102,19 @@ Resources:
             Resource:
               - "*"
 
+  SnsPublishPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: authorize to publish sns topic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - sns:Publish
+            Resource:
+              - "*"
+
   S3Policy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -136,6 +149,7 @@ Resources:
         - !Ref DynamoDBStreamReadPolicy
         - !Ref PutEventPolicy
         - !Ref S3Policy
+        - !Ref SnsPublishPolicy
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
