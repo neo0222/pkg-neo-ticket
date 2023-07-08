@@ -330,7 +330,7 @@ Resources:
       Environment:
         Variables:
           ENV_NAME: !Ref EnvName
-          NOTIFICATION_TOPIC_ARN: !GetAtt SNSVacantSeatNotificationTopic.Arn
+          NOTIFICATION_TOPIC_ARN: !GetAtt SNSVacantSeatNotificationTopic.TopicArn
       FunctionName: !Sub ${NameTag}-${EnvName}-PersistVacantSeat
       Handler: src/main/application/seat/PersistVacantSeat/index.handler
       Role: !GetAtt RoleLambda.Arn
