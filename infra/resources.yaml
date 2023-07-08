@@ -321,6 +321,7 @@ Resources:
 
   LambdaPersistVacantSeat:
     Type: AWS::Lambda::Function
+    DependsOn: SNSVacantSeatNotificationTopic
     Properties:
       Description: 空席永続化処理
       Code:
