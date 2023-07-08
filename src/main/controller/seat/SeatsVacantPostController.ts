@@ -23,8 +23,10 @@ export class SeatsVacantPostController implements IController {
 
       const performanceCode: PerformanceCode = this.convertIdToCode(performanceId) // TODO: 今後マスタ管理する
       const vacantSeatList: Seat[] = (await this.vacantSeatRepository.findByCode(performanceCode)).get()
+      const seatList: SeatViewModel[] = vacantSeatList.filter(seat => seat.isAppropriate()).map(entity => SeatViewModel.of(entity))
       return new ApiGatewayLambdaResponse<SeatsVacantPostResponseBody>(200, {
-        seatList: vacantSeatList.filter(seat => seat.isAppropriate()).map(entity => SeatViewModel.of(entity))
+        size: seatList.length,
+        seatList,
       })
     } catch (error) {
       console.error(error)
