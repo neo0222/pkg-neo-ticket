@@ -89,7 +89,7 @@ export class Seat extends EntityBase {
   }
 
   get notificationSubject() {
-    return `Vacant seat Detection - ${this.performanceId} ${this.performanceDate.formatEn} ${this.matineeOrSoiree === MatineeOrSoiree.MATINEE ? 'Matinee' : 'Soiree'} ${this.seatInfo.formatEn}`
+    return `Vacant seat Detection - ${this.performanceId} ${this.performanceDate.formatEn()} ${this.matineeOrSoiree === MatineeOrSoiree.MATINEE ? 'Matinee' : 'Soiree'} ${this.seatInfo.formatEn}`
     // return `空席通知 ${this.performanceName} ${this.performanceDate.formatJp} ${this.performanceStartTime.formatJp}開演 ${this.seatInfo.format}`
   }
 
