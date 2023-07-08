@@ -82,6 +82,7 @@ export class PersistVacantSeatController implements IController {
               )
               await this.seatRepository.save(seat)
               // 通知
+              console.log(`publish notification: Subject: ${seat.notificationSubject} , Message: ${seat.notificationMessage}`)
               await this.snsInvoker.publish(seat.notificationSubject, seat.notificationMessage)
             })())
           }
