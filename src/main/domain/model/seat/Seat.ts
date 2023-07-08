@@ -89,11 +89,12 @@ export class Seat extends EntityBase {
   }
 
   get notificationSubject() {
-    return `空席通知 ${this.performanceName} ${this.performanceDate.formatJp} ${this.performanceStartTime.formatJp}開演 ${this.seatInfo.format}`
+    return `Vacant seat Detection - ${this.performanceId} ${this.performanceDate.formatEn} ${this.matineeOrSoiree === MatineeOrSoiree.MATINEE ? 'Matinee' : 'Soiree'} ${this.seatInfo.formatEn}`
+    // return `空席通知 ${this.performanceName} ${this.performanceDate.formatJp} ${this.performanceStartTime.formatJp}開演 ${this.seatInfo.format}`
   }
 
   get notificationMessage() {
-    return `掲題の通り、以下のチケットが取得可能になりました。以下リンクから購入できます。
+    return `以下のチケットが取得可能になりました。以下リンクから購入できます。
 https://entrance.shiki.jp/ticket/top.do
 
 【チケット情報】
