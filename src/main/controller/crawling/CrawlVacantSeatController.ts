@@ -4,14 +4,17 @@ import { EventBridgeLambdaEvent } from "../../application/event-bridge/EventBrid
 import { CrawlingResult } from "../../domain/model/crawling-result/CrawlingResult"
 import { Session } from "../../domain/model/session/Session"
 import { ICrawlingResultRepository } from "../../domain/repository/crawling-result/ICrawlingResultRepository"
+import { ISessionRepository } from "../../domain/repository/session/ISessionRepository"
 import { PerformanceCode } from "../../domain/value/performance/PerformanceCode"
 import { PerformanceDatetimeInfo } from "../../domain/value/performance/PerformanceDatetimeInfo"
 import { PerformanceDatetimeInfoList } from "../../domain/value/performance/PerformanceDatetimeInfoList"
 import { PerformanceId } from "../../domain/value/performance/PerformanceId"
 import { PerformanceName } from "../../domain/value/performance/PerformanceName"
 import { VacantSeatInfoList } from "../../domain/value/seat/VacantSeatInfoList"
+import { SessionGoal } from "../../domain/value/session/SessionGoal"
 import { ICrawlingInvoker } from "../../gateway/ICrawlingInvoker"
 import { IS3Invoker } from "../../gateway/IS3Invoker"
+import { CommonUtil } from "../../util/CommonUtil"
 import { IController } from "../IController"
 
 export class CrawlVacantSeatController implements IController {
@@ -19,15 +22,18 @@ export class CrawlVacantSeatController implements IController {
   crawlingInvoker: ICrawlingInvoker
   s3Invoker: IS3Invoker
   crawlingResultRepository: ICrawlingResultRepository
+  sessionRepository: ISessionRepository
 
   constructor(
     crawlingInvoker: ICrawlingInvoker,
     s3Invoker: IS3Invoker,
-    crawlingResultRepository: ICrawlingResultRepository
+    crawlingResultRepository: ICrawlingResultRepository,
+    sessionRepository: ISessionRepository,
   ) {
     this.crawlingInvoker = crawlingInvoker
     this.s3Invoker = s3Invoker
     this.crawlingResultRepository = crawlingResultRepository
+    this.sessionRepository = sessionRepository
   }
 
   async execute(event: EventBridgeLambdaEvent<BatchAssignCrawlingDetail>): Promise<any> {
@@ -43,12 +49,14 @@ export class CrawlVacantSeatController implements IController {
       const performanceDatetimeInfoAndRawCrawlingResultMap: Map<PerformanceDatetimeInfo, string> = new Map<PerformanceDatetimeInfo, string>()
       const processAvailableDatetimeList = async (availableDatetimeList: PerformanceDatetimeInfoList) => {
         const newSession: Session = await this.crawlingInvoker.getSession()
-        await this.crawlingInvoker.leadSessionForDateSelection(
-          newSession,
-          yyyymm,
-          PerformanceCode.create(performanceCode),
-          koenKi,
+        newSession.setGoal(
+          SessionGoal.create({
+            yyyymm: yyyymm,
+            performanceCode: performanceCode,
+            koenki: koenKi
+          })
         )
+        await this.waitUntilSessionIsReady(newSession)
         console.log(`start crawling process. perfomanceCode: ${performanceCode}, yyyymm: ${yyyymm}, target list: ${availableDatetimeList}`)
         for (const availableDatetime of availableDatetimeList.list) {
           const vacantSeatSvg: string = await this.crawlingInvoker.getAvailableSeatSvg(newSession, yyyymm, availableDatetime)
@@ -104,6 +112,26 @@ export class CrawlVacantSeatController implements IController {
     } catch (error) {
       console.log(error)
       throw error
+    }
+  }
+
+  async waitUntilSessionIsReady(session: Session): Promise<void> {
+    await this.sessionRepository.save(session)
+    let retryCount = 0
+    const initialIntervalSecond: number = 0.3
+    let intervalSecond: number = initialIntervalSecond
+    while (true) {
+      const maybeReadySession = await this.sessionRepository.findBySkSession(session.skSession)
+      if (maybeReadySession.isReady) {
+        console.log(`session ${session.skSession} is ready.`)
+        return
+      }
+      await CommonUtil.sleep(intervalSecond)
+      intervalSecond = intervalSecond * 2
+      retryCount++
+      if (retryCount > 10) {
+        console.log(`[WARN]session wait retry count: ${retryCount}, session: ${session.skSession}`)
+      }
     }
   }
 

@@ -81,8 +81,13 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       'https://tickets.shiki.jp/ticket/RY104004.do')
   
     await CommonUtil.sleep(1)
-  
-    return { skSession, bigIpKeyValueJoinWithEqual, headersForPost, headersForHtml }
+
+    return new Session(
+      skSession,
+      bigIpKeyValueJoinWithEqual,
+      headersForPost,
+      headersForHtml
+    )
   }
 
   async getYearAndMonthList(session: Session, performanceCode: PerformanceCode, koenKi: string): Promise<string[]> {

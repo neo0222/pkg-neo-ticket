@@ -30,6 +30,23 @@ export class DynamoAccessor {
     });
   }
 
+  async getItemByPk<T extends IDto>(pk: string): Promise<T> {
+    const params: AWS.DynamoDB.DocumentClient.GetItemInput = {
+      TableName: this.tableName,
+      Key: {
+        pk: pk,
+      },
+    }
+    try {
+      const result: AWS.DynamoDB.DocumentClient.GetItemOutput = await this.docClient.get(params).promise();
+      return result.Item as T;
+    }
+    catch (error) {
+      console.error(error)
+      throw new Error("DynamoAccessError");
+    }
+  }
+
   async getItemByPkAndSk<T extends IDto>(pk: string, sk: string): Promise<T> {
     const params: AWS.DynamoDB.DocumentClient.GetItemInput = {
       TableName: this.tableName,

@@ -228,6 +228,27 @@ Resources:
         StreamViewType: NEW_AND_OLD_IMAGES
 
   #----------------------------------------------
+  # SESSION
+  #----------------------------------------------
+  SESSION:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+      TableName: !Sub SESSION-${EnvName}
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      StreamSpecification:
+        StreamViewType: NEW_IMAGES
+
+  #----------------------------------------------
   # S3 Bucket
   #----------------------------------------------
   S3CrawlingBucket:
@@ -385,6 +406,32 @@ Resources:
       Runtime: nodejs16.x
       Timeout: 900
       MemorySize: 4096
+
+  LambdaGrowUpSession:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: セッション育成処理
+      Code:
+        S3Bucket: !Sub ${NameTag}-${EnvName}-release
+        S3Key: !Sub ${ObjectKeyPrefix}/Deploy.zip
+      Environment:
+        Variables:
+          ENV_NAME: !Ref EnvName
+          NOTIFICATION_TOPIC_ARN: !GetAtt SNSVacantSeatNotificationTopic.TopicArn
+      FunctionName: !Sub ${NameTag}-${EnvName}-GrowUpSession
+      Handler: src/main/application/session/GrowUpSession/index.handler
+      Role: !GetAtt RoleLambda.Arn
+      Runtime: nodejs16.x
+      Timeout: 900
+      MemorySize: 10240
+      ReservedConcurrentExecutions: 3
+
+  LambdaGrowUpSessionEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !GetAtt SESSION.StreamArn
+      FunctionName: !Ref LambdaGrowUpSession
+      StartingPosition: TRIM_HORIZON
 
   ######################################################
   # Event Bus

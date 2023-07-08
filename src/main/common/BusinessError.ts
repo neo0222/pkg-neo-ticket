@@ -8,6 +8,8 @@ export const BusinessError = {
   PERFORMANCE_CODE_NOT_GIVEN: 'error.performance.code.not.given',
   PERFORMANCE_DATE_NOT_GIVEN: 'error.performance.date.not.given',
   MATINEE_OR_SOIREE_NOT_GIVEN: 'error.matinee.or.soiree.not.given',
+  REQUIRED_PARAMETER_NOT_GIVEN: 'error.required.parameter.not.given',
+  SESSION_NOT_FOUND: 'error.session.not.found',
 } as const;
 
 export type BusinessError = typeof BusinessError[keyof typeof BusinessError];
