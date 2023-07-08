@@ -315,6 +315,7 @@ Resources:
       Environment:
         Variables:
           ENV_NAME: !Ref EnvName
+          NOTIFICATION_TOPIC_ARN: !GetAtt SNSVacantSeatNotificationTopic.Arn
       FunctionName: !Sub ${NameTag}-${EnvName}-PersistVacantSeat
       Handler: src/main/application/seat/PersistVacantSeat/index.handler
       Role: !GetAtt RoleLambda.Arn
@@ -540,3 +541,8 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref LambdaSeatsVacantPost
       Principal: apigateway.amazonaws.com
+
+  SNSVacantSeatNotificationTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      TopicName: !Sub ${NameTag}-${EnvName}-VacantSeatNotificationTopic
