@@ -89,7 +89,7 @@ export class Seat extends EntityBase {
   }
 
   get notificationSubject() {
-    return `Vacant seat Detection - ${this.performanceId} ${this.performanceDate.formatEn()} ${this.matineeOrSoiree === MatineeOrSoiree.MATINEE ? 'Matinee' : 'Soiree'} ${this.seatInfo.formatEn}`
+    return `Detected vacant seat - ${this.performanceId} ${this.performanceDate.formatEn()} ${this.matineeOrSoiree === MatineeOrSoiree.MATINEE ? 'Matinee' : 'Soiree'} ${this.seatInfo.formatEn}`
     // return `空席通知 ${this.performanceName} ${this.performanceDate.formatJp} ${this.performanceStartTime.formatJp}開演 ${this.seatInfo.format}`
   }
 
@@ -100,7 +100,7 @@ https://entrance.shiki.jp/ticket/top.do
 【チケット情報】
 公演名：${this.performanceName}
 公演日：${this.performanceDate.formatJp()}
-開演時刻：${this.performanceStartTime.formatJp()}開演
+開演時刻：${this.performanceStartTime.formatJp()}
 座席：${this.seatInfo.format}`
   }
 }
