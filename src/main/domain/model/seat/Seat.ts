@@ -89,7 +89,7 @@ export class Seat extends EntityBase {
   }
 
   get notificationSubject() {
-    return `[空席通知]${this.performanceName} ${this.performanceDate.formatJp} ${this.performanceStartTime.formatJp}開演 ${this.seatInfo.format}`
+    return `空席通知 ${this.performanceName} ${this.performanceDate.formatJp} ${this.performanceStartTime.formatJp}開演 ${this.seatInfo.format}`
   }
 
   get notificationMessage() {
