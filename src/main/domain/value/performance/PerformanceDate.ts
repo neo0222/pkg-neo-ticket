@@ -21,6 +21,10 @@ export class PerformanceDate extends PrimitiveValueObject<moment.Moment> {
     return this._value.format('YYYY年M月D日(ddd)')
   }
 
+  formatEn(): string {
+    return this._value.format('YYYY-M-D')
+  }
+
   equals(target: PerformanceDate): boolean {
     return this._value.isSame(target._value)
   }
