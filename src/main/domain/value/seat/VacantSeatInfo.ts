@@ -41,7 +41,7 @@ export class VacantSeatInfo extends ValueObject<VacantSeatInfoProps> {
   }
 
   get formatEn() {
-    return `${this.floor}F ${this.row}-${this.column}番`
+    return `${this.floor}F ${this.row}-${this.column}`
   }
 
   equals(other: VacantSeatInfo): boolean {
