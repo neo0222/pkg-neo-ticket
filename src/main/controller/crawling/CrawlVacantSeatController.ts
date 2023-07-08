@@ -41,13 +41,24 @@ export class CrawlVacantSeatController implements IController {
         PerformanceCode.create(performanceCode),
         koenKi)
       const performanceDatetimeInfoAndRawCrawlingResultMap: Map<PerformanceDatetimeInfo, string> = new Map<PerformanceDatetimeInfo, string>()
-      for (const availableDatetime of availableDatetimeList.list) {
-        const vacantSeatSvg: string = await this.crawlingInvoker.getAvailableSeatSvg(session, yyyymm, availableDatetime)
-        performanceDatetimeInfoAndRawCrawlingResultMap.set(
-          availableDatetime,
-          vacantSeatSvg
+      const processAvailableDatetimeList = async (availableDatetimeList: PerformanceDatetimeInfoList) => {
+        for (const availableDatetime of availableDatetimeList.list) {
+          const newSession: Session = await this.crawlingInvoker.getSession()
+          const vacantSeatSvg: string = await this.crawlingInvoker.getAvailableSeatSvg(newSession, yyyymm, availableDatetime)
+          performanceDatetimeInfoAndRawCrawlingResultMap.set(
+            availableDatetime,
+            vacantSeatSvg
+          )
+        }
+      }
+      const availableDatetimeListList: PerformanceDatetimeInfoList[] = availableDatetimeList.split()
+      const crawlByDatePromises: Promise<void>[] = []
+      for (const availableDatetimeList of availableDatetimeListList) {
+        crawlByDatePromises.push(
+          processAvailableDatetimeList(availableDatetimeList)
         )
       }
+      await Promise.all(crawlByDatePromises)
       const performanceCodeMap = {
         '3015': {
           performanceId: 'frozen',
