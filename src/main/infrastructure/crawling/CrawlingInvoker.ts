@@ -93,10 +93,10 @@ export class CrawlingInvoker implements ICrawlingInvoker {
         headersForHtml
       )
     }
-    const retryInitialIntervalSecond: number = 1
+    const retryInitialIntervalSecond: number = 0.8
     let retryIntervalSecond: number = retryInitialIntervalSecond
     let retryCount: number = 0
-    const retryMaxCount: number = 10
+    const retryMaxCount: number = 30
     while (true) {
       try {
         return await getSession()
