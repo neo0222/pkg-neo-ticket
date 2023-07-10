@@ -138,6 +138,14 @@ export class CrawlingInvoker implements ICrawlingInvoker {
     console.log(yyyyMmSelectPromise.yyyyMmList)
   
     CommonUtil.sleep(1)
+
+    await axiosInstance.post(
+      'https://tickets.shiki.jp/ticket/RY104004.do?alctChange=0',
+      {},
+      {
+        headers: session.headersForHtml,
+      }
+    )
   
     return yyyyMmSelectPromise.yyyyMmList
   }
