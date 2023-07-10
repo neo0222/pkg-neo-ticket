@@ -11,5 +11,5 @@ export interface ISessionRepository extends IRepositoryBase<Session> {
   save(session: Session): Promise<void>
   findBySkSession(
     skSession: string,
-  )
+  ): Promise<Optional<Session>>
 }

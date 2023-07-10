@@ -1,6 +1,7 @@
 import moment from "moment"
 import { BatchAssignCrawlingDetail } from "../../application/crawling/detail/BatchAssignCrawlingDetail"
 import { EventBridgeLambdaEvent } from "../../application/event-bridge/EventBridgeLambdaEvent"
+import { BusinessError } from "../../common/BusinessError"
 import { CrawlingResult } from "../../domain/model/crawling-result/CrawlingResult"
 import { Session } from "../../domain/model/session/Session"
 import { ICrawlingResultRepository } from "../../domain/repository/crawling-result/ICrawlingResultRepository"
@@ -49,6 +50,7 @@ export class CrawlVacantSeatController implements IController {
       const performanceDatetimeInfoAndRawCrawlingResultMap: Map<PerformanceDatetimeInfo, string> = new Map<PerformanceDatetimeInfo, string>()
       const processAvailableDatetimeList = async (availableDatetimeList: PerformanceDatetimeInfoList) => {
         const newSession: Session = await this.crawlingInvoker.getSession()
+        console.log(`[SUCCESS]got new srssion. session: ${JSON.stringify(newSession)}`)
         newSession.setGoal(
           SessionGoal.create({
             yyyymm: yyyymm,
@@ -121,15 +123,19 @@ export class CrawlVacantSeatController implements IController {
     const initialIntervalSecond: number = 0.3
     let intervalSecond: number = initialIntervalSecond
     while (true) {
-      const maybeReadySession = await this.sessionRepository.findBySkSession(session.skSession)
+      const maybeReadySession: Session = (await this.sessionRepository.findBySkSession(session.skSession))
+        .orElseThrow(
+          BusinessError.SESSION_NOT_FOUND,
+        )
       if (maybeReadySession.isReady) {
-        console.log(`session ${session.skSession} is ready.`)
+        console.log(`[SUCCESS]session ${session.skSession} is ready. retryCount: ${retryCount}`)
         return
       }
+      console.log(`[SUCCESS]session ${session.skSession} is NOT ready. Going to retry in ${intervalSecond} sec... (retryCount: ${retryCount}) session: ${maybeReadySession}`)
       await CommonUtil.sleep(intervalSecond)
       intervalSecond = intervalSecond * 2
       retryCount++
-      if (retryCount > 10) {
+      if (retryCount > 5) {
         console.log(`[WARN]session wait retry count: ${retryCount}, session: ${session.skSession}`)
       }
     }
