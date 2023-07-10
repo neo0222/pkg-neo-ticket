@@ -88,6 +88,7 @@ Resources:
               - dynamodb:ListStreams
             Resource:
               - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/CRAWLING_RESULT-${EnvName}/stream/*
+              - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/SESSION-${EnvName}/stream/*
 
   PutEventPolicy:
     Type: AWS::IAM::ManagedPolicy
