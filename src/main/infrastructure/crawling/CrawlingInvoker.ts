@@ -14,6 +14,8 @@ import * as parser from 'fast-xml-parser'
 import { PerformanceCode } from "../../domain/value/performance/PerformanceCode";
 import { amphiFloorMapping } from "./amphiFloorMapping"
 import { jiyuFloorMapping } from "./jiyuFloorMapping";
+import { BusinessError } from "../../common/BusinessError";
+import { SystemError } from "../../common/SystemError";
 
 const akiFloorMapping = {
   floorAndRowMapping: {
@@ -60,34 +62,54 @@ const axiosInstance = axios.create({ timeout: 20000 })
 
 export class CrawlingInvoker implements ICrawlingInvoker {
   async getSession(): Promise<Session> {
-    const topPageRes = await axiosInstance.get(
-      'https://entrance.shiki.jp/ticket/top.do'
-    )
-    console.log(`[SUCCESS]moved to performance select page.`)
-  
-    const skSession = topPageRes.headers['set-cookie'][0].replace(/\;.*/, '').replace(/SKSESSION=/, '')
-    const jSessionId = topPageRes.headers['set-cookie'][2].replace(/\;.*/, '').replace(/JSESSIONID=/, '')
-    const bigIpKeyValueJoinWithEqual = topPageRes.headers['set-cookie'][3].replace(/\;.*/, '')
-    console.log(`[SUCCESS]got Cookies. SKSESSION: ${skSession}, JSESSIONID: ${jSessionId}, ${bigIpKeyValueJoinWithEqual}`)
-  
-    const headersForPost = this.createHeadersForPost(skSession,
-      jSessionId,
-      bigIpKeyValueJoinWithEqual,
-      'https://tickets.shiki.jp/ticket/RY104004.do')
+    const getSession = async (): Promise<Session> => {
+      const topPageRes = await axiosInstance.get(
+        'https://entrance.shiki.jp/ticket/top.do'
+      )
+      console.log(`[SUCCESS]moved to performance select page.`)
     
-    const headersForHtml = this.createHeadersForHtml(skSession,
-      jSessionId,
-      bigIpKeyValueJoinWithEqual,
-      'https://tickets.shiki.jp/ticket/RY104004.do')
+      const skSession = topPageRes.headers['set-cookie'][0].replace(/\;.*/, '').replace(/SKSESSION=/, '')
+      const jSessionId = topPageRes.headers['set-cookie'][2].replace(/\;.*/, '').replace(/JSESSIONID=/, '')
+      const bigIpKeyValueJoinWithEqual = topPageRes.headers['set-cookie'][3].replace(/\;.*/, '')
+      console.log(`[SUCCESS]got Cookies. SKSESSION: ${skSession}, JSESSIONID: ${jSessionId}, ${bigIpKeyValueJoinWithEqual}`)
+    
   
-    await CommonUtil.sleep(1)
+      const headersForPost = this.createHeadersForPost(skSession,
+        jSessionId,
+        bigIpKeyValueJoinWithEqual,
+        'https://tickets.shiki.jp/ticket/RY104004.do')
+      
+      const headersForHtml = this.createHeadersForHtml(skSession,
+        jSessionId,
+        bigIpKeyValueJoinWithEqual,
+        'https://tickets.shiki.jp/ticket/RY104004.do')
+    
+      await CommonUtil.sleep(1)
 
-    return new Session(
-      skSession,
-      bigIpKeyValueJoinWithEqual,
-      headersForPost,
-      headersForHtml
-    )
+      return new Session(
+        skSession,
+        bigIpKeyValueJoinWithEqual,
+        headersForPost,
+        headersForHtml
+      )
+    }
+    const retryInitialIntervalSecond: number = 0.2
+    let retryIntervalSecond: number = retryInitialIntervalSecond
+    let retryCount: number = 0
+    const retryMaxCount: number = 5
+    while (true) {
+      try {
+        return await getSession()
+      } catch (error) {
+        if (retryCount > retryMaxCount) {
+          throw SystemError.RETRY_MAX_COUNT_EXCEEDED
+        }
+        console.log(`[ERROR]cannot get session. retrying in ${retryIntervalSecond} sec... (retryCount: ${retryCount})`)
+        await CommonUtil.sleep(retryIntervalSecond)
+        retryIntervalSecond = retryIntervalSecond * 2
+        retryCount++
+      }
+    }
   }
 
   async getYearAndMonthList(session: Session, performanceCode: PerformanceCode, koenKi: string): Promise<string[]> {

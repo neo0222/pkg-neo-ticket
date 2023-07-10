@@ -15,6 +15,7 @@ export const SystemError = {
   USER_ID_NOT_GIVEN: 'error.user.ids.not.given',
   USER_TYPE_NOT_GIVEN: 'error.user.type.not.given',
   SOURCE_IP_NOT_GIVEN: 'error.source.ip.not.given',
+  RETRY_MAX_COUNT_EXCEEDED: 'error.retry.max.count.exceeded',
 } as const;
 
 export type SystemError = typeof SystemError[keyof typeof SystemError];
