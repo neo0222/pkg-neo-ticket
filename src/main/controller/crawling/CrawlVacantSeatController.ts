@@ -108,7 +108,7 @@ export class CrawlVacantSeatController implements IController {
             availableDatetime.startTime,
             vacantSeatInfoList
           )
-          this.crawlingResultRepository.save(crawlingResult)
+          await this.crawlingResultRepository.save(crawlingResult)
         })())
       }
       await Promise.all(promises)
