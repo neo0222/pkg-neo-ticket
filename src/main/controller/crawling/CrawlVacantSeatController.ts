@@ -49,8 +49,25 @@ export class CrawlVacantSeatController implements IController {
         yyyymm,
         PerformanceCode.create(performanceCode),
         koenKi)
-      const performanceDatetimeInfoAndRawCrawlingResultMap: Map<PerformanceDatetimeInfo, string> = new Map<PerformanceDatetimeInfo, string>()
-      const processAvailableDatetimeList = async (newSession: Session, availableDatetimeList: PerformanceDatetimeInfoList) => {
+      const getSessions = async (requiredCount: number): Promise<Session[]> => {
+        console.log(`[INFO]get ${requiredCount} sessions.`)
+        const sessionList: Session[] = []
+        while (true) {
+          try {
+            sessionList.push(await this.crawlingInvoker.getSession())
+            console.log(`[INFO]got ${sessionList.length} sessions.`)
+            if (sessionList.length === requiredCount) {
+              console.log(`[INFO]preparation for sessions successfully completed.`)
+              return sessionList
+            }
+          } catch {
+            console.log(`[WARN]failed to get session. trying again in 0.5 sec...`)
+          }
+        }
+      }
+      const processAvailableDatetimeList = async (availableDatetimeList: PerformanceDatetimeInfoList) => {
+        const newSession: Session = (await getSessions(1))[0]
+        const performanceDatetimeInfoAndRawCrawlingResultMap: Map<PerformanceDatetimeInfo, string> = new Map<PerformanceDatetimeInfo, string>()
         newSession.setGoal(
           SessionGoal.create({
             yyyymm: yyyymm,
@@ -67,69 +84,52 @@ export class CrawlVacantSeatController implements IController {
             vacantSeatSvg
           )
         }
-      }
-      const getSessions = async (requiredCount: number): Promise<Session[]> => {
-        console.log(`[INFO]get ${requiredCount} sessions.`)
-        const sessionList: Session[] = []
-        while (true) {
-          try {
-            sessionList.push(await this.crawlingInvoker.getSession())
-            console.log(`[INFO]got ${sessionList.length} sessions.`)
-            if (sessionList.length === requiredCount) {
-              console.log(`[INFO]preparation for sessions successfully completed.`)
-              return sessionList
-            }
-          } catch {
-            console.log(`[WARN]failed to get session. trying again in 0.5 sec...`)
-            await CommonUtil.sleep(0.5)
-          }
+        const performanceCodeMap = {
+          '3015': {
+            performanceId: 'frozen',
+            performanceName: 'アナと雪の女王',
+          },
+          '3009': {
+            performanceId: 'the-hunchback-of-notre-dame',
+            performanceName: 'ノートルダムの鐘',
+          },
+          '2007': {
+            performanceId: 'beauty-and-the-beast',
+            performanceName: '美女と野獣',
+          },
+          '3017': {
+            performanceId: 'beauty-and-the-beast-2',
+            performanceName: '美女と野獣',
+          },
         }
+        console.log(`performanceDatetimeInfoAndRawCrawlingResultMap.size: ${performanceDatetimeInfoAndRawCrawlingResultMap.size}`)
+        const promises: Promise<void>[] = []
+        for (const [availableDatetime, rawCrawlingResult] of performanceDatetimeInfoAndRawCrawlingResultMap.entries()) {
+          promises.push((async () => {
+            const vacantSeatInfoList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(rawCrawlingResult, PerformanceCode.create(performanceCode))
+            const crawlingResult: CrawlingResult = new CrawlingResult(
+              PerformanceId.create(performanceCodeMap[performanceCode].performanceId), // TODO: 演目マスタをDBにもつようにする
+              PerformanceCode.create(performanceCode),
+              PerformanceName.create(performanceCodeMap[performanceCode].performanceName), // TODO: 演目マスタをDBにもつようにする
+              availableDatetime.day,
+              availableDatetime.matineeOrSoiree,
+              availableDatetime.startTime,
+              vacantSeatInfoList
+            )
+            await this.crawlingResultRepository.save(crawlingResult)
+          })())
+        }
+        await Promise.all(promises)
       }
-      const sessionList: Session[] = await getSessions(this.CRAWL_CONCURRENCY)
       const availableDatetimeListList: PerformanceDatetimeInfoList[] = availableDatetimeList.split(this.CRAWL_CONCURRENCY)
       const crawlByDatePromises: Promise<void>[] = []
       for (const [ index, availableDatetimeList] of availableDatetimeListList.entries()) {
         crawlByDatePromises.push(
-          processAvailableDatetimeList(sessionList[index], availableDatetimeList)
+          processAvailableDatetimeList(availableDatetimeList)
         )
       }
       await Promise.all(crawlByDatePromises)
-      const performanceCodeMap = {
-        '3015': {
-          performanceId: 'frozen',
-          performanceName: 'アナと雪の女王',
-        },
-        '3009': {
-          performanceId: 'the-hunchback-of-notre-dame',
-          performanceName: 'ノートルダムの鐘',
-        },
-        '2007': {
-          performanceId: 'beauty-and-the-beast',
-          performanceName: '美女と野獣',
-        },
-        '3017': {
-          performanceId: 'beauty-and-the-beast-2',
-          performanceName: '美女と野獣',
-        },
-      }
-      console.log(`performanceDatetimeInfoAndRawCrawlingResultMap.size: ${performanceDatetimeInfoAndRawCrawlingResultMap.size}`)
-      const promises: Promise<void>[] = []
-      for (const [availableDatetime, rawCrawlingResult] of performanceDatetimeInfoAndRawCrawlingResultMap.entries()) {
-        promises.push((async () => {
-          const vacantSeatInfoList: VacantSeatInfoList = await this.crawlingInvoker.getAvailableSeatList(rawCrawlingResult, PerformanceCode.create(performanceCode))
-          const crawlingResult: CrawlingResult = new CrawlingResult(
-            PerformanceId.create(performanceCodeMap[performanceCode].performanceId), // TODO: 演目マスタをDBにもつようにする
-            PerformanceCode.create(performanceCode),
-            PerformanceName.create(performanceCodeMap[performanceCode].performanceName), // TODO: 演目マスタをDBにもつようにする
-            availableDatetime.day,
-            availableDatetime.matineeOrSoiree,
-            availableDatetime.startTime,
-            vacantSeatInfoList
-          )
-          await this.crawlingResultRepository.save(crawlingResult)
-        })())
-      }
-      await Promise.all(promises)
+      
     } catch (error) {
       console.log(error)
       throw error
