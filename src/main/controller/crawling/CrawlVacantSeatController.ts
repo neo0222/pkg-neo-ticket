@@ -66,6 +66,7 @@ export class CrawlVacantSeatController implements IController {
         }
       }
       const processAvailableDatetimeList = async (availableDatetimeList: PerformanceDatetimeInfoList) => {
+        if (availableDatetimeList.isEmpty()) return
         const newSession: Session = (await getSessions(1))[0]
         const performanceDatetimeInfoAndRawCrawlingResultMap: Map<PerformanceDatetimeInfo, string> = new Map<PerformanceDatetimeInfo, string>()
         newSession.setGoal(
