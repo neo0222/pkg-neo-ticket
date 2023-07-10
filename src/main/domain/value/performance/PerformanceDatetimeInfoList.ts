@@ -10,17 +10,16 @@ interface PerformanceDatetimeInfoListArgs {
 }
 
 export class PerformanceDatetimeInfoList extends ValueObject<PerformanceDatetimeInfoListProps> {
-  private SPLIT_SIZE: number = 5
   static create(args: PerformanceDatetimeInfoListArgs): PerformanceDatetimeInfoList {
     return new PerformanceDatetimeInfoList({
       list: args.list,
     });
   }
 
-  split(): PerformanceDatetimeInfoList[] {
+  split(splitSize: number): PerformanceDatetimeInfoList[] {
     const groups: PerformanceDatetimeInfo[][] = [];
     const length = this.list.length;
-    const chunkSize = Math.ceil(length / this.SPLIT_SIZE);
+    const chunkSize = Math.ceil(length / splitSize);
 
     for (let i = 0; i < length; i += chunkSize) {
       const group: PerformanceDatetimeInfo[] = this.list.slice(i, i + chunkSize);

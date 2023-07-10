@@ -37,6 +37,8 @@ export class CrawlVacantSeatController implements IController {
     this.sessionRepository = sessionRepository
   }
 
+  readonly CRAWL_CONCURRENCY: number = 5
+
   async execute(event: EventBridgeLambdaEvent<BatchAssignCrawlingDetail>): Promise<any> {
     try {
       const { time } = event
@@ -48,9 +50,7 @@ export class CrawlVacantSeatController implements IController {
         PerformanceCode.create(performanceCode),
         koenKi)
       const performanceDatetimeInfoAndRawCrawlingResultMap: Map<PerformanceDatetimeInfo, string> = new Map<PerformanceDatetimeInfo, string>()
-      const processAvailableDatetimeList = async (availableDatetimeList: PerformanceDatetimeInfoList) => {
-        const newSession: Session = await this.crawlingInvoker.getSession()
-        console.log(`[SUCCESS]got new srssion. session: ${JSON.stringify(newSession)}`)
+      const processAvailableDatetimeList = async (newSession: Session, availableDatetimeList: PerformanceDatetimeInfoList) => {
         newSession.setGoal(
           SessionGoal.create({
             yyyymm: yyyymm,
@@ -68,11 +68,29 @@ export class CrawlVacantSeatController implements IController {
           )
         }
       }
-      const availableDatetimeListList: PerformanceDatetimeInfoList[] = availableDatetimeList.split()
+      const getSessions = async (requiredCount: number): Promise<Session[]> => {
+        console.log(`[INFO]get ${requiredCount} sessions.`)
+        const sessionList: Session[] = []
+        while (true) {
+          try {
+            sessionList.push(await this.crawlingInvoker.getSession())
+            console.log(`[INFO]got ${sessionList.length} sessions.`)
+            if (sessionList.length === requiredCount) {
+              console.log(`[INFO]preparation for sessions successfully completed.`)
+              return sessionList
+            }
+          } catch {
+            console.log(`[WARN]failed to get session. trying again in 0.5 sec...`)
+            await CommonUtil.sleep(0.5)
+          }
+        }
+      }
+      const sessionList: Session[] = await getSessions(this.CRAWL_CONCURRENCY)
+      const availableDatetimeListList: PerformanceDatetimeInfoList[] = availableDatetimeList.split(this.CRAWL_CONCURRENCY)
       const crawlByDatePromises: Promise<void>[] = []
-      for (const availableDatetimeList of availableDatetimeListList) {
+      for (const [ index, availableDatetimeList] of availableDatetimeListList.entries()) {
         crawlByDatePromises.push(
-          processAvailableDatetimeList(availableDatetimeList)
+          processAvailableDatetimeList(sessionList[index], availableDatetimeList)
         )
       }
       await Promise.all(crawlByDatePromises)
