@@ -80,9 +80,9 @@ export class PersistVacantSeatController implements IController {
                 vacantSeatInfo,
                 DetectionDatetime.fromUnixTime(unixTime)
               )
-              await this.seatRepository.save(seat)
               // 通知
               if (seat.isAppropriate()) {
+                await this.seatRepository.save(seat)
                 console.log(`publish notification: Subject: ${seat.notificationSubject} , Message: ${seat.notificationMessage}`)
                 await this.snsInvoker.publish(seat.notificationSubject, seat.notificationMessage)
               }
