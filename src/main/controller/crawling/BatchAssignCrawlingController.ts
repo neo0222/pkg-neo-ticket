@@ -56,8 +56,8 @@ export class BatchAssignCrawlingController implements IController {
           // dayClick('ry101001Form','3017','00',3,'0');
         },
       ]
+      const session: Session = await this.crawlingInvoker.getSession()
       for (const item of items) {
-        const session: Session = await this.crawlingInvoker.getSession()
         const yearAndMonthList: string[] = await this.crawlingInvoker.getYearAndMonthList(session, item.performanceCode, item.koenKi)
         const promises: Promise<void>[] = []
         for (const yyyymm of yearAndMonthList) {

@@ -93,10 +93,10 @@ export class CrawlingInvoker implements ICrawlingInvoker {
         headersForHtml
       )
     }
-    const retryInitialIntervalSecond: number = 0.2
+    const retryInitialIntervalSecond: number = 0.8
     let retryIntervalSecond: number = retryInitialIntervalSecond
     let retryCount: number = 0
-    const retryMaxCount: number = 5
+    const retryMaxCount: number = 8
     while (true) {
       try {
         return await getSession()
@@ -138,6 +138,14 @@ export class CrawlingInvoker implements ICrawlingInvoker {
     console.log(yyyyMmSelectPromise.yyyyMmList)
   
     CommonUtil.sleep(1)
+
+    await axiosInstance.post(
+      'https://tickets.shiki.jp/ticket/RY104004.do?alctChange=0',
+      {},
+      {
+        headers: session.headersForHtml,
+      }
+    )
   
     return yyyyMmSelectPromise.yyyyMmList
   }
