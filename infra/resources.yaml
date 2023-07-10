@@ -246,7 +246,7 @@ Resources:
       SSESpecification:
         SSEEnabled: true
       StreamSpecification:
-        StreamViewType: NEW_IMAGES
+        StreamViewType: NEW_IMAGE
 
   #----------------------------------------------
   # S3 Bucket
