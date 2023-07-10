@@ -106,7 +106,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
         }
         console.log(`[ERROR]cannot get session. retrying in ${retryIntervalSecond} sec... (retryCount: ${retryCount})`)
         await CommonUtil.sleep(retryIntervalSecond)
-        retryIntervalSecond = retryIntervalSecond * 0.5
+        retryIntervalSecond = retryIntervalSecond * 2
         retryCount++
       }
     }
