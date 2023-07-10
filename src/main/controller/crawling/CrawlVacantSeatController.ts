@@ -94,6 +94,7 @@ export class CrawlVacantSeatController implements IController {
           performanceName: '美女と野獣',
         },
       }
+      console.log(`performanceDatetimeInfoAndRawCrawlingResultMap.size: ${performanceDatetimeInfoAndRawCrawlingResultMap.size}`)
       const promises: Promise<void>[] = []
       for (const [availableDatetime, rawCrawlingResult] of performanceDatetimeInfoAndRawCrawlingResultMap.entries()) {
         promises.push((async () => {
@@ -107,7 +108,7 @@ export class CrawlVacantSeatController implements IController {
             availableDatetime.startTime,
             vacantSeatInfoList
           )
-          this.crawlingResultRepository.save(crawlingResult)
+          await this.crawlingResultRepository.save(crawlingResult)
         })())
       }
       await Promise.all(promises)
