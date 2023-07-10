@@ -81,8 +81,13 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       'https://tickets.shiki.jp/ticket/RY104004.do')
   
     await CommonUtil.sleep(1)
-  
-    return { skSession, bigIpKeyValueJoinWithEqual, headersForPost, headersForHtml }
+
+    return new Session(
+      skSession,
+      bigIpKeyValueJoinWithEqual,
+      headersForPost,
+      headersForHtml
+    )
   }
 
   async getYearAndMonthList(session: Session, performanceCode: PerformanceCode, koenKi: string): Promise<string[]> {
@@ -114,8 +119,8 @@ export class CrawlingInvoker implements ICrawlingInvoker {
   
     return yyyyMmSelectPromise.yyyyMmList
   }
-
-  async getAvailabledatetimeList(session: Session, yyyymm: string, performanceCode: PerformanceCode, koenKi: string): Promise<PerformanceDatetimeInfoList> {
+  
+  async leadSessionForDateSelection(session: Session, yyyymm: string, performanceCode: PerformanceCode, koenKi: string): Promise<any> {
     await axiosInstance.post(
       `https://tickets.shiki.jp/ticket/RY101002.do?koenCode=${performanceCode}&edaban=00&koenKi=${koenKi}&allJapan=0`,
       {},
@@ -149,6 +154,11 @@ export class CrawlingInvoker implements ICrawlingInvoker {
       }
     )
     console.log(`[SUCCESS]moved to date select page on ${yyyymm}.`)
+    return selectYyyyMmPageRes
+  }
+
+  async getAvailabledatetimeList(session: Session, yyyymm: string, performanceCode: PerformanceCode, koenKi: string): Promise<PerformanceDatetimeInfoList> {
+    const selectYyyyMmPageRes = await this.leadSessionForDateSelection(session, yyyymm, performanceCode, koenKi)
 
     console.log(`[START]collect avaiable datetime...`)
     const promise = await htmlToJson.parse(selectYyyyMmPageRes.data, {

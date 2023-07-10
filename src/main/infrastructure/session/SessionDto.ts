@@ -1,36 +1,35 @@
-import { SessionGoal } from "../../value/session/SessionGoal";
-import { EntityBase } from "../EntityBase";
+import { IDto } from "../IDto";
 
-export class Session extends EntityBase {
+export class SessionDto implements IDto {
+  pk: string
   skSession: string
   bigIpKeyValueJoinWithEqual: string
   headersForPost: object
   headersForHtml: object
   isReady?: string
-  sessionGoal?: SessionGoal
+  performanceCode: string
+  koenki: string
+  yyyymm?: string
 
   constructor(
+    _pk: string,
     _skSession: string,
     _bigIpKeyValueJoinWithEqual: string,
     _headersForPost: object,
     _headersForHtml: object,
-    _isReady?: string,
-    _sessionGoal?: SessionGoal,
+    _isReady: string | undefined,
+    _performanceCode: string,
+    _koenki: string,
+    _yyyymm?: string,
   ) {
-    super()
+    this.pk = _pk
     this.skSession = _skSession
     this.bigIpKeyValueJoinWithEqual = _bigIpKeyValueJoinWithEqual
     this.headersForPost = _headersForPost
     this.headersForHtml = _headersForHtml
     this.isReady = _isReady
-    this.sessionGoal = _sessionGoal
-  }
-
-  ready() {
-    this.isReady = 'true'
-  }
-
-  setGoal(sessionGoal: SessionGoal) {
-    this.sessionGoal = sessionGoal
+    this.performanceCode = _performanceCode
+    this.koenki = _koenki
+    this.yyyymm = _yyyymm
   }
 }

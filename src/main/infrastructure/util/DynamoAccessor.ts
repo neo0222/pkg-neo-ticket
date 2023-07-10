@@ -30,6 +30,23 @@ export class DynamoAccessor {
     });
   }
 
+  async getItemByPk<T extends IDto>(pk: string): Promise<T> {
+    const params: AWS.DynamoDB.DocumentClient.GetItemInput = {
+      TableName: this.tableName,
+      Key: {
+        pk: pk,
+      },
+    }
+    try {
+      const result: AWS.DynamoDB.DocumentClient.GetItemOutput = await this.docClient.get(params).promise();
+      return result.Item as T;
+    }
+    catch (error) {
+      console.error(error)
+      throw new Error("DynamoAccessError");
+    }
+  }
+
   async getItemByPkAndSk<T extends IDto>(pk: string, sk: string): Promise<T> {
     const params: AWS.DynamoDB.DocumentClient.GetItemInput = {
       TableName: this.tableName,
@@ -290,6 +307,22 @@ export class DynamoAccessor {
     catch (error: any) {
       console.error(error)
       throw SystemError.DYNAMO_ACCESS_FAILED
+    }
+  }
+
+  async deleteByPk(pk: string): Promise<void> {
+    const params: AWS.DynamoDB.DocumentClient.DeleteItemInput = {
+      TableName: this.tableName,
+      Key: {
+        pk: pk,
+      },
+    }
+    try {
+      const result: AWS.DynamoDB.DocumentClient.DeleteItemOutput = await this.docClient.delete(params).promise();
+    }
+    catch (error) {
+      console.error(error)
+      throw new Error("DynamoAccessError");
     }
   }
 }
