@@ -31,30 +31,30 @@ export class BatchAssignCrawlingController implements IController {
         //   performanceCode: PerformanceCode.create('1013'),
         //   koenKi: '14',
         // },
-        {
-          performanceCode: PerformanceCode.create('3015'),
-          koenKi: '5',
-          // アナ雪 2023/7-2023/12
-          // onclick="dayClick('ry101001Form','3015','00',5,'0');"
-        },
+        // {
+        //   performanceCode: PerformanceCode.create('3015'),
+        //   koenKi: '5',
+        //   // アナ雪 2023/7-2023/12
+        //   // onclick="dayClick('ry101001Form','3015','00',5,'0');"
+        // },
         {
           performanceCode: PerformanceCode.create('3009'),
           koenKi: '1',
           // ノートルダム
           // dayClick('ry101001Form','3009','00',1,'0');
         },
-        {
-          performanceCode: PerformanceCode.create('2007'),
-          koenKi: '2',
-          // 美女と野獣
-          // dayClick('ry101001Form','2007','00',2,'0');
-        },
-        {
-          performanceCode: PerformanceCode.create('3017'),
-          koenKi: '3',
-          // 美女と野獣
-          // dayClick('ry101001Form','3017','00',3,'0');
-        },
+        // {
+        //   performanceCode: PerformanceCode.create('2007'),
+        //   koenKi: '2',
+        //   // 美女と野獣
+        //   // dayClick('ry101001Form','2007','00',2,'0');
+        // },
+        // {
+        //   performanceCode: PerformanceCode.create('3017'),
+        //   koenKi: '3',
+        //   // 美女と野獣
+        //   // dayClick('ry101001Form','3017','00',3,'0');
+        // },
       ]
       const session: Session = await this.crawlingInvoker.getSession()
       for (const item of items) {
