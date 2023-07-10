@@ -93,10 +93,10 @@ export class CrawlingInvoker implements ICrawlingInvoker {
         headersForHtml
       )
     }
-    const retryInitialIntervalSecond: number = 0.2
+    const retryInitialIntervalSecond: number = 1
     let retryIntervalSecond: number = retryInitialIntervalSecond
     let retryCount: number = 0
-    const retryMaxCount: number = 5
+    const retryMaxCount: number = 10
     while (true) {
       try {
         return await getSession()
@@ -106,7 +106,7 @@ export class CrawlingInvoker implements ICrawlingInvoker {
         }
         console.log(`[ERROR]cannot get session. retrying in ${retryIntervalSecond} sec... (retryCount: ${retryCount})`)
         await CommonUtil.sleep(retryIntervalSecond)
-        retryIntervalSecond = retryIntervalSecond * 2
+        retryIntervalSecond = retryIntervalSecond
         retryCount++
       }
     }
