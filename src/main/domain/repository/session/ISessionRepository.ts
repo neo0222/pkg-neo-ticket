@@ -12,4 +12,7 @@ export interface ISessionRepository extends IRepositoryBase<Session> {
   findBySkSession(
     skSession: string,
   ): Promise<Optional<Session>>
+  deleteBySkSession(
+    skSession: string,
+  ): Promise<void>
 }

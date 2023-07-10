@@ -32,4 +32,8 @@ export class SessionRepository implements ISessionRepository {
     )
     return Optional.ofNullable(dto ? SessionConverter.toEntity(dto) : undefined)
   }
+
+  async deleteBySkSession(skSession: string): Promise<void> {
+    await this.dynamoAccessor.deleteByPk(skSession)
+  }
 }

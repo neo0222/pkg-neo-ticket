@@ -309,4 +309,20 @@ export class DynamoAccessor {
       throw SystemError.DYNAMO_ACCESS_FAILED
     }
   }
+
+  async deleteByPk(pk: string): Promise<void> {
+    const params: AWS.DynamoDB.DocumentClient.DeleteItemInput = {
+      TableName: this.tableName,
+      Key: {
+        pk: pk,
+      },
+    }
+    try {
+      const result: AWS.DynamoDB.DocumentClient.DeleteItemOutput = await this.docClient.delete(params).promise();
+    }
+    catch (error) {
+      console.error(error)
+      throw new Error("DynamoAccessError");
+    }
+  }
 }

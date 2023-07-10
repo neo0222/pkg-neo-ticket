@@ -129,9 +129,11 @@ export class CrawlVacantSeatController implements IController {
         )
       if (maybeReadySession.isReady) {
         console.log(`[SUCCESS]session ${session.skSession} is ready. retryCount: ${retryCount}`)
+        await this.sessionRepository.deleteBySkSession(session.skSession)
+        console.log(`[SUCCESS]ready session ${session.skSession} is successfully deleted.`)
         return
       }
-      console.log(`[SUCCESS]session ${session.skSession} is NOT ready. Going to retry in ${intervalSecond} sec... (retryCount: ${retryCount}) session: ${maybeReadySession}`)
+      console.log(`[INFO]session ${session.skSession} is NOT ready. Going to retry in ${intervalSecond} sec... (retryCount: ${retryCount}) session: ${JSON.stringify(maybeReadySession)}`)
       await CommonUtil.sleep(intervalSecond)
       intervalSecond = intervalSecond * 2
       retryCount++
